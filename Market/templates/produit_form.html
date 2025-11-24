@@ -1,0 +1,414 @@
+{% extends "base.html" %}
+{% block title %}Gestion Produit{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-section {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 25px;
+        border-left: 4px solid var(--primary-color);
+    }
+    
+    .form-section h5 {
+        color: var(--primary-color);
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+        padding: 12px 15px;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+    }
+    
+    .form-control-lg {
+        padding: 15px;
+        font-size: 1.1rem;
+    }
+    
+    .image-preview {
+        max-width: 200px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .image-preview:hover {
+        transform: scale(1.05);
+    }
+    
+    .btn-action {
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .required-field::after {
+        content: " *";
+        color: var(--danger-color);
+    }
+    
+    .character-count {
+        font-size: 0.875rem;
+        color: #6c757d;
+        text-align: right;
+        margin-top: 5px;
+    }
+    
+    .stock-indicator {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 8px;
+    }
+    
+    .stock-low { background-color: var(--danger-color); }
+    .stock-medium { background-color: var(--warning-color); }
+    .stock-high { background-color: var(--success-color); }
+    
+    .price-input-group {
+        position: relative;
+    }
+    
+    .price-input-group .input-group-text {
+        background-color: #e9ecef;
+        border: 2px solid #e9ecef;
+        border-right: none;
+        border-radius: 8px 0 0 8px;
+        font-weight: 600;
+    }
+    
+    .price-input-group .form-control {
+        border-left: none;
+        border-radius: 0 8px 8px 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card-custom">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="page-title mb-0">
+            <i class="fas fa-{{ form.instance.id|yesno:'edit,plus' }} me-2"></i>
+            {{ title }}
+        </h2>
+        <a href="{% url 'page_produits' %}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+        </a>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" action="{% url 'crate_produit' %}" id="produitForm" novalidate>
+        {% csrf_token %}
+
+        <!-- Section Informations de base -->
+        <div class="form-section">
+            <h5><i class="fas fa-info-circle me-2"></i>Informations de base</h5>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-4">
+                        <label class="form-label required-field">Nom du produit</label>
+                        <input type="text" name="nom" class="form-control form-control-lg"
+                               value="{{ form.nom.value|default_if_none:'' }}" 
+                               placeholder="Ex : Tomates fraîches, Ordinateur portable..."
+                               required maxlength="100">
+                        <div class="character-count">
+                            <span id="nomCount">0</span>/100 caractères
+                        </div>
+                        {% if form.nom.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.nom.errors %}
+                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label required-field">Prix (FCFA)</label>
+                        <div class="price-input-group input-group">
+                            <span class="input-group-text">FCFA</span>
+                            <input type="number" name="prix" class="form-control"
+                                   value="{{ form.prix.value|default_if_none:'' }}"
+                                   min="0" step="0.01" required>
+                        </div>
+                        {% if form.prix.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.prix.errors %}
+                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-4">
+                        <label class="form-label required-field">Quantité en stock</label>
+                        <input type="number" name="quantite_en_stock" class="form-control"
+                               value="{{ form.quantite_en_stock.value|default_if_none:'0' }}"
+                               min="0" required>
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <span class="stock-indicator stock-{% if form.quantite_en_stock.value <= 10 %}low{% elif form.quantite_en_stock.value <= 50 %}medium{% else %}high{% endif %}"></span>
+                                {% if form.quantite_en_stock.value <= 10 %}
+                                Stock faible
+                                {% elif form.quantite_en_stock.value <= 50 %}
+                                Stock moyen
+                                {% else %}
+                                Stock élevé
+                                {% endif %}
+                            </small>
+                        </div>
+                        {% if form.quantite_en_stock.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.quantite_en_stock.errors %}
+                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Catégorie et Commerçant -->
+        <div class="form-section">
+            <h5><i class="fas fa-tags me-2"></i>Classification</h5>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-4">
+                        <label class="form-label required-field">Catégorie</label>
+                        <select name="categorie_id" id="categorieSelect" class="form-select form-select-lg" required>
+                            <option value="">Sélectionnez une catégorie</option>
+                            {% for cat in ensemble %}
+                            <option value="{{ cat.id }}" {% if form.categorie_id.value == cat.id %}selected{% endif %}>
+                                {{ cat.nom }}
+                            </option>
+                            {% endfor %}
+                            <option value="create" class="fw-bold text-primary">
+                                <i class="fas fa-plus me-1"></i>Créer une nouvelle catégorie
+                            </option>
+                        </select>
+                        {% if form.categorie_id.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.categorie_id.errors %}
+                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-4">
+                        <label class="form-label required-field">Commerçant</label>
+                        <select name="Commercant_id" class="form-select form-select-lg" required>
+                            <option value="">Sélectionnez un commerçant</option>
+                            {% for c in comerce %}
+                            <option value="{{ c.id }}" {% if form.Commercant_id.value == c.id %}selected{% endif %}>
+                                {{ c.utilisateur.nom|default:c.utilisateur.nom }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% if form.Commercant_id.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.Commercant_id.errors %}
+                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Description -->
+        <div class="form-section">
+            <h5><i class="fas fa-align-left me-2"></i>Description</h5>
+            
+            <div class="mb-4">
+                <label class="form-label">Description du produit</label>
+                <textarea name="description" class="form-control" rows="5"
+                          placeholder="Décrivez votre produit en détail... (caractéristiques, avantages, etc.)"
+                          maxlength="500">{{ form.description.value|default_if_none:'' }}</textarea>
+                <div class="character-count">
+                    <span id="descriptionCount">0</span>/500 caractères
+                </div>
+                {% if form.description.errors %}
+                <div class="text-danger small mt-1">
+                    {% for error in form.description.errors %}
+                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Section Image -->
+        <div class="form-section">
+            <h5><i class="fas fa-image me-2"></i>Image du produit</h5>
+            
+            <div class="mb-4">
+                <label class="form-label">Image du produit</label>
+                <input type="file" name="image" class="form-control" accept="image/*" id="imageInput">
+                <div class="form-text">
+                    Formats acceptés : JPG, PNG, GIF. Taille maximale : 5MB
+                </div>
+                {% if form.image.errors %}
+                <div class="text-danger small mt-1">
+                    {% for error in form.image.errors %}
+                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Aperçu de l'image -->
+            <div id="imagePreviewContainer" class="mt-3 {% if not form.instance.image %}d-none{% endif %}">
+                <label class="form-label">Aperçu :</label>
+                <div class="d-flex align-items-center">
+                    {% if form.instance.image %}
+                    <img src="{{ form.instance.image.url }}" class="image-preview me-3" id="currentImage">
+                    {% endif %}
+                    <img src="" class="image-preview me-3 d-none" id="newImagePreview">
+                    <button type="button" class="btn btn-outline-danger btn-sm" id="removeImageBtn">
+                        <i class="fas fa-trash me-1"></i>Supprimer
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="d-flex gap-3 justify-content-end pt-4 border-top">
+            <a href="{% url 'page_produits' %}" class="btn btn-outline-secondary btn-action">
+                <i class="fas fa-times me-2"></i>Annuler
+            </a>
+            <button type="submit" class="btn btn-success btn-action">
+                <i class="fas fa-save me-2"></i>Enregistrer le produit
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const categorieSelect = document.getElementById('categorieSelect');
+    const imageInput = document.getElementById('imageInput');
+    const newImagePreview = document.getElementById('newImagePreview');
+    const currentImage = document.getElementById('currentImage');
+    const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+    const removeImageBtn = document.getElementById('removeImageBtn');
+    const nomInput = document.querySelector('input[name="nom"]');
+    const descriptionTextarea = document.querySelector('textarea[name="description"]');
+    const nomCount = document.getElementById('nomCount');
+    const descriptionCount = document.getElementById('descriptionCount');
+    const form = document.getElementById('produitForm');
+
+    // Gestion de la création de catégorie
+    categorieSelect.addEventListener('change', function() {
+        if (this.value === "create") {
+            if (confirm('Souhaitez-vous créer une nouvelle catégorie ?')) {
+                window.location.href = "{% url 'categorie' %}";
+            } else {
+                this.value = "";
+            }
+        }
+    });
+
+    // Prévisualisation de l'image
+    imageInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                newImagePreview.src = e.target.result;
+                newImagePreview.classList.remove('d-none');
+                if (currentImage) {
+                    currentImage.classList.add('d-none');
+                }
+                imagePreviewContainer.classList.remove('d-none');
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Suppression de l'image
+    removeImageBtn.addEventListener('click', function() {
+        imageInput.value = '';
+        newImagePreview.classList.add('d-none');
+        if (currentImage) {
+            currentImage.classList.add('d-none');
+        }
+        imagePreviewContainer.classList.add('d-none');
+    });
+
+    // Compteur de caractères
+    function updateCharacterCount(element, counter) {
+        counter.textContent = element.value.length;
+    }
+
+    nomInput.addEventListener('input', function() {
+        updateCharacterCount(this, nomCount);
+    });
+
+    descriptionTextarea.addEventListener('input', function() {
+        updateCharacterCount(this, descriptionCount);
+    });
+
+    // Initialiser les compteurs
+    updateCharacterCount(nomInput, nomCount);
+    updateCharacterCount(descriptionTextarea, descriptionCount);
+
+    // Validation du formulaire
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        const requiredFields = form.querySelectorAll('[required]');
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                isValid = false;
+                field.classList.add('is-invalid');
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+
+        if (!isValid) {
+            e.preventDefault();
+            alert('Veuillez remplir tous les champs obligatoires.');
+        }
+    });
+
+    // Validation en temps réel
+    form.querySelectorAll('[required]').forEach(field => {
+        field.addEventListener('blur', function() {
+            if (!this.value.trim()) {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

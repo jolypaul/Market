@@ -7,6 +7,8 @@ class Produit(models.Model):
     prix = models.DecimalField(max_digits=10, decimal_places=0)
     quantite_en_stock = models.PositiveIntegerField(default=0)
     date_ajout = models.DateTimeField(auto_now_add=True)
+    Commercant_id = models.ForeignKey('Authentification.Commercant', on_delete=models.CASCADE)
+    categorie_id = models.ForeignKey('GestionProduits.Categorie', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.nom

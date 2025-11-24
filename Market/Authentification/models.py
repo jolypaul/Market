@@ -1,8 +1,9 @@
 from django.db import models
 
 class Utilisateur(models.Model):
-    email = models.EmailField(unique=True, unique=True)
+    email = models.EmailField(unique=True)
     nom = models.CharField(max_length=150)
+    image = models.ImageField(upload_to='utilisateurs/', blank=True, null=True)
     motDePasse = models.CharField(max_length=128)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

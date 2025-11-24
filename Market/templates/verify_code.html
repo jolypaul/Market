@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- templates/verify_code.html -->
+<form method="POST">
+    {% csrf_token %}
+    <label>Code à 6 chiffres :</label>
+    <input type="text" name="code" required>
+    <button type="submit">Vérifier</button>
+</form>
+
+</body>
+</html>

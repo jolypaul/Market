@@ -1,22 +1,22 @@
-"""
-URL configuration for Market project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
-from django.urls import path
+from django.conf.urls.static import static
+from django.conf import settings
+from django.urls import path,include
+from .views import login,register,produit,categorie,form_modifier_produit,page_produits,appeler_page_favorie
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('auth/',include('Authentification.urls')),
+    path('produit/',include('GestionProduits.urls')),
+    path('',include('Favoris.urls')),
+    path('',login, name='login'),
+    path('register/',register,name='register'),
+    path('produit/',produit,name='produit'),
+    path('appeler_page_favorie/',appeler_page_favorie,name='appeler_page_favorie'),
+    path('categorie/',categorie,name='categorie'),
+    path('form_modifier_produit/<int:id>',form_modifier_produit,name='form_modifier_produit'),
+    path('page_produits/',page_produits,name='page_produits'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
