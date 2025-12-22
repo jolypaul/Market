@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Livraisons</h1>
+<ul>
+  {% for livraison in livraisons %}
+    <li>
+      Livraison #{{ livraison.id }} — Statut: {{ livraison.statut }} — {{ livraison.date_livraison }}
+      <a href="{% url 'suivre_livraison' livraison.id %}">Suivre</a>
+      <a href="{% url 'evaluer_livraison' livraison.id %}">Évaluer</a>
+    </li>
+  {% empty %}
+    <li>Aucune livraison trouvée.</li>
+  {% endfor %}
+</ul>
+
+{% endblock %}

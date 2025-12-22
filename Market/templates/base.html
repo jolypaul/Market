@@ -1,0 +1,247 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Marché Virtuel - Votre plateforme d'achat en ligne">
+    <title>{% block title %}Marché Virtuel{% endblock %}</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        :root {
+            --bs-primary: #667eea;
+            --bs-secondary: #764ba2;
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        main {
+            flex: 1;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            color: white !important;
+            font-weight: bold;
+        }
+        
+        .navbar-dark .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            transition: color 0.3s;
+        }
+        
+        .navbar-dark .navbar-nav .nav-link:hover {
+            color: white !important;
+        }
+        
+        .navbar-dark .navbar-nav .nav-link.active {
+            color: white !important;
+            font-weight: 600;
+        }
+        
+        footer {
+            background: #1f2937;
+            color: #e5e7eb;
+            margin-top: auto;
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dropdown-menu {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-store me-2"></i>
+                Marché Virtuel
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav me-auto fw-semibold">
+                    <li class="nav-item">
+                        <a href="/" class="nav-link">
+                            <i class="fas fa-home me-1"></i> Accueil
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'liste_produits' %}" class="nav-link">
+                            <i class="fas fa-box me-1"></i> Produits
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'liste_categories' %}" class="nav-link">
+                            <i class="fas fa-tags me-1"></i> Catégories
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'afficher_publications' %}" class="nav-link {% if request.resolver_match.url_name == 'afficher_publications' %}active{% endif %}">
+                            <i class="fas fa-pen me-1"></i> Publications
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav">
+                    <!-- Panier -->
+                    <li class="nav-item me-2">
+                        <a href="{% url 'afficher_panier' %}" class="nav-link">
+                            <i class="fas fa-shopping-cart me-1"></i> Panier
+                        </a>
+                    </li>
+                    <!-- Favoris -->
+                    <li class="nav-item me-2">
+                        <a href="{% url 'appeler_page_favorie' %}" class="nav-link">
+                            <i class="fas fa-heart me-1"></i> Favoris
+                        </a>
+                    </li>
+
+                    {% if request.session.nom %}
+                    <!-- Menu User Connecté -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-1"></i> {{ request.session.nom }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Mon profil</a></li>
+                            {% if request.session.role == 'client' %}
+                            <li><a class="dropdown-item" href="{% url 'liste_commandes' %}"><i class="fas fa-receipt me-2"></i> Mes commandes</a></li>
+                            <li><a class="dropdown-item" href="{% url 'afficher_livraisons' %}"><i class="fas fa-truck me-2"></i> Mes livraisons</a></li>
+                            {% elif request.session.role == 'commercant' %}
+                            <li><a class="dropdown-item" href="{% url 'page_produits' %}"><i class="fas fa-store me-2"></i> Ma boutique</a></li>
+                            {% endif %}
+                            <li><a class="dropdown-item" href="{% url 'afficher_notifications' %}"><i class="fas fa-bell me-2"></i> Notifications</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'connexion' %}" onclick="return confirm('Êtes-vous sûr ?')"><i class="fas fa-sign-out-alt me-2"></i> Déconnexion</a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <!-- Bouton Connexion pour Utilisateur Non Connecté -->
+                    <li class="nav-item">
+                        <a href="{% url 'connexion' %}" class="btn btn-light btn-sm px-3">
+                            <i class="fas fa-sign-in-alt me-1"></i> Connexion
+                        </a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a href="{% url 'register' %}" class="btn btn-outline-light btn-sm px-3">
+                            <i class="fas fa-user-plus me-1"></i> Inscription
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {% if message.tags == 'success' %}
+            <i class="fas fa-check-circle me-2"></i>
+            {% elif message.tags == 'error' %}
+            <i class="fas fa-exclamation-circle me-2"></i>
+            {% elif message.tags == 'warning' %}
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            {% else %}
+            <i class="fas fa-info-circle me-2"></i>
+            {% endif %}
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- CONTENU PRINCIPAL -->
+    <main class="container my-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- PIED DE PAGE -->
+    <footer class="mt-5 py-4">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-md-4 mb-3">
+                    <h5 class="fw-bold mb-3">Marché Virtuel</h5>
+                    <p class="text-muted">Votre plateforme d'achat et de vente en ligne préférée.</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5 class="fw-bold mb-3">Liens rapides</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'liste_produits' %}" class="text-muted text-decoration-none"><i class="fas fa-chevron-right me-1"></i> Produits</a></li>
+                        <li><a href="{% url 'liste_categories' %}" class="text-muted text-decoration-none"><i class="fas fa-chevron-right me-1"></i> Catégories</a></li>
+                        <li><a href="{% url 'afficher_panier' %}" class="text-muted text-decoration-none"><i class="fas fa-chevron-right me-1"></i> Panier</a></li>
+                        <li><a href="{% url 'appeler_page_favorie' %}" class="text-muted text-decoration-none"><i class="fas fa-chevron-right me-1"></i> Favoris</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5 class="fw-bold mb-3">Contact</h5>
+                    <ul class="list-unstyled text-muted">
+                        <li><i class="fas fa-envelope me-2"></i> contact@marche-virtuel.com</li>
+                        <li><i class="fas fa-phone me-2"></i> +33 1 23 45 67 89</li>
+                        <li><i class="fas fa-map-marker-alt me-2"></i> Paris, France</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-3">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center text-muted text-center">
+                <p class="mb-0">&copy; 2025 Marché Virtuel. Tous droits réservés.</p>
+                <div class="mt-3 mt-md-0">
+                    <a href="#" class="text-muted me-3 text-decoration-none"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-muted me-3 text-decoration-none"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-muted text-decoration-none"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-dismiss des alertes après 5 secondes
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                setTimeout(function() {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 5000);
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

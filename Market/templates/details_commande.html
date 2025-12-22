@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Détails de la commande #{{ commande.id }}</h1>
+<p>Client : {{ commande.client.utilisateur.nom }}</p>
+<p>Statut : {{ commande.statut }}</p>
+<p>Date : {{ commande.date_commande }}</p>
+<h2>Produits</h2>
+<ul>
+  {% for item in commande.items.all %}
+    <li>{{ item.produit.nom }} — Qté: {{ item.quantite }} — Prix: {{ item.prix_unitaire }}</li>
+  {% empty %}
+    <li>Aucun produit</li>
+  {% endfor %}
+<p>Total : {{ commande.total }}</p>
+
+{% endblock %}

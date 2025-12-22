@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0">Publications</h1>
+  {% if request.session.role == 'commercant' %}
+    <a class="btn btn-success" href="{% url 'ajouter_publication' %}">Ajouter une publication</a>
+  {% endif %}
+</div>
+
+<div>
+  {% for publication in publications %}
+    <div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0;">
+      <h2>{{ publication.titre }}</h2>
+      <p>Par {{ publication.auteur.utilisateur.nom }} — {{ publication.date_publication }}</p>
+      <p>{{ publication.contenu }}</p>
+      
+      {% if request.session.user_id and request.session.user_id == publication.auteur.utilisateur.id %}
+        <a href="{% url 'modifier_publication' publication.id %}">Modifier</a>
+        <a href="{% url 'supprimer_publication' publication.id %}">Supprimer</a>
+      {% endif %}
+    </div>
+  {% empty %}
+    <p>Aucune publication trouvée.</p>
+  {% endfor %}
+</div>
+
+{% endblock %}

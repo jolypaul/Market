@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Modifier Produit{% endblock %}
+
+{% block content %}
+<h2>Modifier le produit : {{ produit.nom }}</h2>
+
+<form method="POST" enctype="multipart/form-data" action="{% url 'modifierProduit' produit.id %}">
+    {% csrf_token %}
+
+    <label>Nom :</label>
+    <input type="text" name="nom" value="{{ produit.nom }}" required>
+
+    <label>Description :</label>
+    <textarea name="description">{{ produit.description }}</textarea>
+
+    <label>Prix :</label>
+    <input type="number" name="prix" value="{{ produit.prix }}" required>
+
+    <label>Stock :</label>
+    <input type="number" name="quantite_en_stock" value="{{ produit.quantite_en_stock }}" required>
+
+    <label>Catégorie :</label>
+    <select name="categorie_id" required>
+        {% for cat in categories %}
+        <option value="{{ cat.id }}" 
+            {% if cat.id == produit.categorie_id_id %}selected{% endif %}>
+            {{ cat.nom }}
+        </option>
+        {% endfor %}
+    </select>
+
+    <label>Commerçant :</label>
+    <select name="Commercant_id">
+        <option value="{{ produit.Commercant_id_id }}">
+            {{ produit.Commercant_id.utilisateur.nom }}
+        </option>
+    </select>
+
+    <label>Image actuelle :</label>
+    {% if produit.image %}
+        <img src="{{ produit.image.url }}" width="120">
+    {% endif %}
+
+    <label>Changer l’image :</label>
+    <input type="file" name="image">
+
+    <button type="submit" class="btn btn-success">Enregistrer</button>
+</form>
+
+{% endblock %}

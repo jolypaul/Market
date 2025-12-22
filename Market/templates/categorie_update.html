@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Modifier Catégorie{% endblock %}
+
+{% block content %}
+<h2>Modifier la catégorie : {{ categories.nom }}</h2>
+
+<form method="POST" action="{% url 'modifier_categorie' categories_id=categories.id %}">
+    {% csrf_token %}
+    
+    <label>Nom :</label>
+    <input type="text" name="nom" value="{{ categories.nom }}" required>
+
+    <label>Description :</label>
+    <textarea name="description">{{ categories.description }}</textarea>
+
+    <button type="submit" class="btn btn-success">Enregistrer</button>
+</form>
+
+{% endblock %}

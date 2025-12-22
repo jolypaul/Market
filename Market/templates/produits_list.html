@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Produits{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h1>Produits</h1>
+  <div class="row">
+    {% for p in produits %}
+      <div class="col-md-4 mb-3">
+        <div class="card">
+          {% if p.image %}
+            <img src="{{ p.image.url }}" class="card-img-top" alt="{{ p.nom }}">
+          {% endif %}
+          <div class="card-body">
+            <h5 class="card-title">{{ p.nom }}</h5>
+            <p class="card-text">{{ p.description|truncatewords:20 }}</p>
+            <p class="mb-2"><strong>{{ p.prix }} FCFA</strong></p>
+            <a href="{% url 'detail_produit' p.id %}" class="btn btn-outline-primary">Voir</a>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p>Aucun produit disponible.</p>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

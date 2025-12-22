@@ -1,0 +1,829 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Inscription à Marché Virtuel - Rejoignez notre plateforme d'achat en ligne">
+    <title>Inscription – Marché Virtuel</title>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--primary-gradient);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .background-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 20s infinite linear;
+        }
+        
+        .shape:nth-child(1) {
+            width: 100px;
+            height: 100px;
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+        
+        .shape:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            top: 70%;
+            left: 85%;
+            animation-delay: -7s;
+        }
+        
+        .shape:nth-child(3) {
+            width: 80px;
+            height: 80px;
+            top: 85%;
+            left: 15%;
+            animation-delay: -14s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+            33% { transform: translateY(-40px) rotate(120deg) scale(1.1); }
+            66% { transform: translateY(40px) rotate(240deg) scale(0.9); }
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 3rem 2.5rem;
+            border-radius: 25px;
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.15),
+                0 0 0 1px rgba(255, 255, 255, 0.3);
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 30px 60px rgba(0, 0, 0, 0.2),
+                0 0 0 1px rgba(255, 255, 255, 0.4);
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 2rem;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+            font-weight: 700;
+            font-size: 2rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 2.5rem;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+        
+        .form-section {
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .section-title i {
+            color: #667eea;
+        }
+        
+        .input-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+        
+        .required::after {
+            content: " *";
+            color: var(--error-color);
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            z-index: 2;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fff;
+            font-family: inherit;
+        }
+        
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+        }
+        
+        input:focus, select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+            transform: translateY(-2px);
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .password-toggle:hover {
+            color: #667eea;
+            background: #f3f4f6;
+        }
+        
+        .user-type-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .user-type-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .user-type-card:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.1);
+        }
+        
+        .user-type-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+        
+        .user-type-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .user-type-name {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+        
+        .user-type-desc {
+            font-size: 0.8rem;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+        
+        .dynamic-fields {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 1rem;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .field-group {
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .password-strength {
+            margin-top: 0.5rem;
+        }
+        
+        .strength-bar {
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .strength-weak { background: var(--error-color); width: 33%; }
+        .strength-medium { background: var(--warning-color); width: 66%; }
+        .strength-strong { background: var(--success-color); width: 100%; }
+        
+        .strength-text {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        button:hover::before {
+            left: 100%;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 2rem;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .message {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            text-align: center;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .message.success {
+            background: #ecfdf5;
+            color: var(--success-color);
+            border: 1px solid #a7f3d0;
+        }
+        
+        .message.error {
+            background: #fef2f2;
+            color: var(--error-color);
+            border: 1px solid #fecaca;
+        }
+        
+        .message.warning {
+            background: #fffbeb;
+            color: var(--warning-color);
+            border: 1px solid #fed7aa;
+        }
+        
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .terms {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+        
+        .terms a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .terms a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 2rem 1.5rem;
+            }
+            
+            .user-type-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 1.7rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .dynamic-fields {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Effets de fond animés -->
+    <div class="background-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <div class="container animate__animated animate__fadeInUp">
+        <!-- Logo -->
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="bi bi-shop-window"></i>
+            </div>
+            <h1>Créer un compte</h1>
+            <p class="subtitle">Rejoignez Marché Virtuel et gérez vos activités en toute simplicité</p>
+        </div>
+
+        <!-- Messages Django -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }} animate__animated animate__fadeIn">
+                <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Formulaire d'inscription -->
+        <form id="registerForm" action="{% url 'inscription' %}" method="post">
+            {% csrf_token %}
+
+            <!-- Section Informations de base -->
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="bi bi-person-circle"></i>
+                    Informations personnelles
+                </div>
+
+                <div class="input-group">
+                    <label for="nom" class="required">Nom complet</label>
+                    <div class="input-with-icon">
+                        <i class="bi bi-person input-icon"></i>
+                        <input type="text" id="nom" name="nom" placeholder="Votre nom complet" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="email" class="required">Adresse email</label>
+                    <div class="input-with-icon">
+                        <i class="bi bi-envelope input-icon"></i>
+                        <input type="email" id="email" name="email" placeholder="exemple@mail.com" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="password" class="required">Mot de passe</label>
+                    <div class="input-with-icon">
+                        <i class="bi bi-lock input-icon"></i>
+                        <input type="password" id="password" name="password" placeholder="Votre mot de passe" required>
+                        <button type="button" class="password-toggle" id="passwordToggle">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    <div class="password-strength">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strengthFill"></div>
+                        </div>
+                        <div class="strength-text" id="strengthText">Force du mot de passe</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Type d'utilisateur -->
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="bi bi-person-badge"></i>
+                    Type de compte
+                </div>
+
+                <div class="user-type-cards">
+                    <div class="user-type-card" data-type="client">
+                        <div class="user-type-icon">
+                            <i class="bi bi-cart"></i>
+                        </div>
+                        <div class="user-type-name">Client</div>
+                        <div class="user-type-desc">Achetez des produits sur notre plateforme</div>
+                    </div>
+
+                    <div class="user-type-card" data-type="commercant">
+                        <div class="user-type-icon">
+                            <i class="bi bi-shop"></i>
+                        </div>
+                        <div class="user-type-name">Commerçant</div>
+                        <div class="user-type-desc">Vendez vos produits en ligne</div>
+                    </div>
+
+                    <div class="user-type-card" data-type="administrateur">
+                        <div class="user-type-icon">
+                            <i class="bi bi-gear"></i>
+                        </div>
+                        <div class="user-type-name">Administrateur</div>
+                        <div class="user-type-desc">Gérez la plateforme</div>
+                    </div>
+
+                    <div class="user-type-card" data-type="livreur">
+                        <div class="user-type-icon">
+                            <i class="bi bi-truck"></i>
+                        </div>
+                        <div class="user-type-name">Livreur</div>
+                        <div class="user-type-desc">Livrez les commandes</div>
+                    </div>
+                </div>
+
+                <select id="userType" name="userType" required class="hidden">
+                    <option value="">-- Sélectionnez --</option>
+                    <option value="client">Client</option>
+                    <option value="commercant">Commerçant</option>
+                    <option value="administrateur">Administrateur</option>
+                    <option value="livreur">Livreur</option>
+                </select>
+            </div>
+
+            <!-- Champs dynamiques -->
+            <div class="dynamic-fields field-group" id="dynamicFields">
+                <!-- Les champs spécifiques apparaîtront ici dynamiquement -->
+            </div>
+
+            <!-- Bouton d'inscription -->
+            <button type="submit" id="registerButton">
+                <span id="buttonText">Créer mon compte</span>
+                <div class="loading-spinner" id="loadingSpinner"></div>
+            </button>
+        </form>
+
+        <!-- Lien de connexion -->
+        <div class="login-link">
+            Déjà un compte ?
+            <a href="{% url 'connexion' %}">Se connecter</a>
+        </div>
+
+        <!-- Conditions d'utilisation -->
+        <div class="terms">
+            En créant un compte, vous acceptez nos 
+            <a href="#">Conditions d'utilisation</a> et notre 
+            <a href="#">Politique de confidentialité</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userTypeCards = document.querySelectorAll('.user-type-card');
+            const userTypeSelect = document.getElementById('userType');
+            const dynamicFields = document.getElementById('dynamicFields');
+            const passwordInput = document.getElementById('password');
+            const passwordToggle = document.getElementById('passwordToggle');
+            const strengthFill = document.getElementById('strengthFill');
+            const strengthText = document.getElementById('strengthText');
+            const registerForm = document.getElementById('registerForm');
+            const registerButton = document.getElementById('registerButton');
+            const buttonText = document.getElementById('buttonText');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+
+            // Templates pour les champs dynamiques
+            const fieldTemplates = {
+                client: `
+                    <div class="section-title">
+                        <i class="bi bi-geo-alt"></i>
+                        Informations client
+                    </div>
+                    <div class="input-group">
+                        <label for="adresse">Adresse</label>
+                        <div class="input-with-icon">
+                            <i class="bi bi-house input-icon"></i>
+                            <input type="text" id="adresse" name="adresse" placeholder="Votre adresse complète">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="telephone">Téléphone</label>
+                        <div class="input-with-icon">
+                            <i class="bi bi-telephone input-icon"></i>
+                            <input type="tel" id="telephone" name="telephone" placeholder="Votre numéro de téléphone">
+                        </div>
+                    </div>
+                `,
+                commercant: `
+                    <div class="section-title">
+                        <i class="bi bi-building"></i>
+                        Informations boutique
+                    </div>
+                    <div class="input-group">
+                        <label for="boutique_nom" class="required">Nom de la boutique</label>
+                        <div class="input-with-icon">
+                            <i class="bi bi-shop input-icon"></i>
+                            <input type="text" id="boutique_nom" name="boutique_nom" placeholder="Nom de votre boutique" required>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="adresse_boutique" class="required">Adresse de la boutique</label>
+                        <div class="input-with-icon">
+                            <i class="bi bi-geo-alt input-icon"></i>
+                            <input type="text" id="adresse_boutique" name="adresse_boutique" placeholder="Adresse de votre boutique" required>
+                        </div>
+                    </div>
+                `,
+                administrateur: `
+                    <div class="section-title">
+                        <i class="bi bi-shield-check"></i>
+                        Informations administrateur
+                    </div>
+                    <div class="input-group">
+                        <label for="role" class="required">Rôle</label>
+                        <div class="input-with-icon">
+                            <i class="bi bi-person-badge input-icon"></i>
+                            <input type="text" id="role" name="role" placeholder="Ex : SuperAdmin" required>
+                        </div>
+                    </div>
+                `,
+                livreur: `
+                    <div class="section-title">
+                        <i class="bi bi-truck"></i>
+                        Informations livreur
+                    </div>
+                    <div class="input-group">
+                        <label for="zone_de_livraison" class="required">Zone de livraison</label>
+                        <div class="input-with-icon">
+                            <i class="bi bi-geo input-icon"></i>
+                            <input type="text" id="zone_de_livraison" name="zone_de_livraison" placeholder="Ex : Dakar, Rufisque" required>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="telephone_livreur" class="required">Téléphone</label>
+                        <div class="input-with-icon">
+                            <i class="bi bi-telephone input-icon"></i>
+                            <input type="tel" id="telephone_livreur" name="telephone" placeholder="Votre numéro de téléphone" required>
+                        </div>
+                    </div>
+                `
+            };
+
+            // Sélection du type d'utilisateur
+            userTypeCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const type = this.getAttribute('data-type');
+                    
+                    // Mettre à jour la sélection visuelle
+                    userTypeCards.forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    // Mettre à jour le select caché
+                    userTypeSelect.value = type;
+                    
+                    // Afficher les champs dynamiques
+                    showFields(type);
+                });
+            });
+
+            function showFields(type) {
+                if (fieldTemplates[type]) {
+                    dynamicFields.innerHTML = fieldTemplates[type];
+                    dynamicFields.classList.remove('hidden');
+                    
+                    // Animation d'entrée
+                    dynamicFields.style.animation = 'slideDown 0.3s ease';
+                } else {
+                    dynamicFields.classList.add('hidden');
+                }
+            }
+
+            // Toggle visibilité mot de passe
+            passwordToggle.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.innerHTML = type === 'password' ? '<i class="bi bi-eye"></i>' : '<i class="bi bi-eye-slash"></i>';
+            });
+
+            // Vérification force mot de passe
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                let strength = 0;
+                let text = 'Force du mot de passe';
+                
+                if (password.length >= 8) strength += 1;
+                if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength += 1;
+                if (password.match(/\d/)) strength += 1;
+                if (password.match(/[^a-zA-Z\d]/)) strength += 1;
+                
+                strengthFill.className = 'strength-fill';
+                
+                if (password.length > 0) {
+                    if (strength <= 1) {
+                        strengthFill.classList.add('strength-weak');
+                        text = 'Faible';
+                    } else if (strength <= 2) {
+                        strengthFill.classList.add('strength-medium');
+                        text = 'Moyen';
+                    } else {
+                        strengthFill.classList.add('strength-strong');
+                        text = 'Fort';
+                    }
+                }
+                
+                strengthText.textContent = text;
+            });
+
+            // Soumission du formulaire
+            registerForm.addEventListener('submit', function(e) {
+                const userType = userTypeSelect.value;
+                
+                if (!userType) {
+                    e.preventDefault();
+                    alert('Veuillez sélectionner un type de compte');
+                    return;
+                }
+
+                // Afficher le loading
+                buttonText.style.display = 'none';
+                loadingSpinner.style.display = 'block';
+                registerButton.disabled = true;
+
+                // Le formulaire sera soumis normalement après
+            });
+
+            // Animation d'entrée des éléments
+            const animateElements = document.querySelectorAll('.input-group, .user-type-card');
+            animateElements.forEach((element, index) => {
+                element.style.animationDelay = `${index * 0.1}s`;
+                element.classList.add('animate__animated', 'animate__fadeInUp');
+            });
+        });
+    </script>
+</body>
+</html>
