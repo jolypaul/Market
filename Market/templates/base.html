@@ -4,15 +4,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <meta name="description" content="Marché Virtuel - Votre plateforme d'achat en ligne">
     <title>{% block title %}Marché Virtuel{% endblock %}</title>
 
     <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Font Awesome pour les icônes -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        :root {
+            --bs-primary: #667eea;
+            --bs-secondary: #764ba2;
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        main {
+            flex: 1;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            color: white !important;
+            font-weight: bold;
+        }
+        
+        .navbar-dark .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            transition: color 0.3s;
+        }
+        
+        .navbar-dark .navbar-nav .nav-link:hover {
+            color: white !important;
+        }
+        
+        .navbar-dark .navbar-nav .nav-link.active {
+            color: white !important;
+            font-weight: 600;
+        }
+        
+        footer {
+            background: #1f2937;
+            color: #e5e7eb;
+            margin-top: auto;
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dropdown-menu {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+        }
+    </style>
 
     {% block extra_css %}{% endblock %}
 </head>
@@ -20,9 +77,9 @@
 <body>
 
     <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container">
-            <a class="navbar-brand fw-bold text-primary d-flex align-items-center" href="/">
+            <a class="navbar-brand" href="/">
                 <i class="fas fa-store me-2"></i>
                 Marché Virtuel
             </a>
@@ -34,57 +91,70 @@
             <div class="collapse navbar-collapse" id="navMenu">
                 <ul class="navbar-nav me-auto fw-semibold">
                     <li class="nav-item">
-                        <a href="{% url 'produit' %}" class="nav-link {% if request.resolver_match.url_name == 'produit' %}active{% endif %}">
+                        <a href="/" class="nav-link">
+                            <i class="fas fa-home me-1"></i> Accueil
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'liste_produits' %}" class="nav-link">
                             <i class="fas fa-box me-1"></i> Produits
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{% url 'categorie' %}" class="nav-link {% if request.resolver_match.url_name == 'categorie' %}active{% endif %}">
+                        <a href="{% url 'liste_categories' %}" class="nav-link">
                             <i class="fas fa-tags me-1"></i> Catégories
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{% url 'page_produits' %}" class="nav-link {% if request.resolver_match.url_name == 'page_produits' %}active{% endif %}">
-                            <i class="fas fa-list me-1"></i> Liste des produits
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'liste_categories' %}" class="nav-link {% if request.resolver_match.url_name == 'liste_categories' %}active{% endif %}">
-                            <i class="fas fa-layer-group me-1"></i> Liste des catégories
+                        <a href="{% url 'afficher_publications' %}" class="nav-link {% if request.resolver_match.url_name == 'afficher_publications' %}active{% endif %}">
+                            <i class="fas fa-pen me-1"></i> Publications
                         </a>
                     </li>
                 </ul>
 
                 <ul class="navbar-nav">
-                    <!-- Lien Favoris -->
-                    <li class="nav-item me-3">
-                        <a href="{% url 'appeler_page_favorie' %}" class="nav-link {% if request.resolver_match.url_name == 'favoris' %}active{% endif %}">
-                            <i class="fas fa-heart me-1"></i> Favoris
-                            {% if user.is_authenticated and request.session.favoris_count %}
-                            <span class="badge bg-danger rounded-pill">{{ request.session.favoris_count }}</span>
-                            {% endif %}
+                    <!-- Panier -->
+                    <li class="nav-item me-2">
+                        <a href="{% url 'afficher_panier' %}" class="nav-link">
+                            <i class="fas fa-shopping-cart me-1"></i> Panier
                         </a>
                     </li>
-{% if request.session.nom %}
-<li class="nav-item dropdown me-3">
-    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-        <i class="fas fa-user-circle me-2"></i>
-        <span>Bonjour, <strong>{{ request.session.nom }}</strong></span>
-    </a>
-    <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Mon profil</a></li>
-        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Paramètres</a></li>
-        <li><a class="dropdown-item" href="{% url 'appeler_page_favorie' %}"><i class="fas fa-heart me-2"></i> Mes favoris</a></li>
-        <li><hr class="dropdown-divider"></li>
-        <li><a class="dropdown-item text-danger" href="{% url 'login' %}"><i class="fas fa-sign-out-alt me-2"></i> Déconnexion</a></li>
-    </ul>
-</li>
-{% else %}
-<!-- affichage pour utilisateur non connecté -->
+                    <!-- Favoris -->
+                    <li class="nav-item me-2">
+                        <a href="{% url 'appeler_page_favorie' %}" class="nav-link">
+                            <i class="fas fa-heart me-1"></i> Favoris
+                        </a>
+                    </li>
 
+                    {% if request.session.nom %}
+                    <!-- Menu User Connecté -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-1"></i> {{ request.session.nom }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Mon profil</a></li>
+                            {% if request.session.role == 'client' %}
+                            <li><a class="dropdown-item" href="{% url 'liste_commandes' %}"><i class="fas fa-receipt me-2"></i> Mes commandes</a></li>
+                            <li><a class="dropdown-item" href="{% url 'afficher_livraisons' %}"><i class="fas fa-truck me-2"></i> Mes livraisons</a></li>
+                            {% elif request.session.role == 'commercant' %}
+                            <li><a class="dropdown-item" href="{% url 'page_produits' %}"><i class="fas fa-store me-2"></i> Ma boutique</a></li>
+                            {% endif %}
+                            <li><a class="dropdown-item" href="{% url 'afficher_notifications' %}"><i class="fas fa-bell me-2"></i> Notifications</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'connexion' %}" onclick="return confirm('Êtes-vous sûr ?')"><i class="fas fa-sign-out-alt me-2"></i> Déconnexion</a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <!-- Bouton Connexion pour Utilisateur Non Connecté -->
                     <li class="nav-item">
-                        <a href="{% url 'login' %}" class="btn btn-primary px-4">
-                            <i class="fas fa-sign-in-alt me-2"></i> Connexion
+                        <a href="{% url 'connexion' %}" class="btn btn-light btn-sm px-3">
+                            <i class="fas fa-sign-in-alt me-1"></i> Connexion
+                        </a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a href="{% url 'register' %}" class="btn btn-outline-light btn-sm px-3">
+                            <i class="fas fa-user-plus me-1"></i> Inscription
                         </a>
                     </li>
                     {% endif %}
@@ -94,89 +164,80 @@
     </nav>
 
     <!-- Messages -->
+    {% if messages %}
     <div class="container mt-3">
-        {% if messages %}
         {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
             {% if message.tags == 'success' %}
             <i class="fas fa-check-circle me-2"></i>
             {% elif message.tags == 'error' %}
             <i class="fas fa-exclamation-circle me-2"></i>
             {% elif message.tags == 'warning' %}
             <i class="fas fa-exclamation-triangle me-2"></i>
-            {% elif message.tags == 'info' %}
+            {% else %}
             <i class="fas fa-info-circle me-2"></i>
             {% endif %}
             {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
         </div>
         {% endfor %}
-        {% endif %}
     </div>
+    {% endif %}
 
     <!-- CONTENU PRINCIPAL -->
-    <main class="container mt-4 mb-5">
+    <main class="container my-4">
         {% block content %}{% endblock %}
     </main>
 
     <!-- PIED DE PAGE -->
-    <footer class="bg-dark text-light py-4 mt-5">
+    <footer class="mt-5 py-4">
         <div class="container">
-            <div class="row">
+            <div class="row mb-4">
                 <div class="col-md-4 mb-3">
-                    <h5 class="fw-bold">Marché Virtuel</h5>
-                    <p class="mb-0">Votre plateforme d'achat en ligne préférée.</p>
+                    <h5 class="fw-bold mb-3">Marché Virtuel</h5>
+                    <p class="text-muted">Votre plateforme d'achat et de vente en ligne préférée.</p>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <h5 class="fw-bold">Liens rapides</h5>
+                    <h5 class="fw-bold mb-3">Liens rapides</h5>
                     <ul class="list-unstyled">
-                        <li><a href="{% url 'produit' %}" class="text-light text-decoration-none">Produits</a></li>
-                        <li><a href="{% url 'categorie' %}" class="text-light text-decoration-none">Catégories</a></li>
-                        <li><a href="{% url 'page_produits' %}" class="text-light text-decoration-none">Liste des produits</a></li>
-                        <li><a href="{% url 'appeler_page_favorie' %}" class="text-light text-decoration-none">Favoris</a></li>
+                        <li><a href="{% url 'liste_produits' %}" class="text-muted text-decoration-none"><i class="fas fa-chevron-right me-1"></i> Produits</a></li>
+                        <li><a href="{% url 'liste_categories' %}" class="text-muted text-decoration-none"><i class="fas fa-chevron-right me-1"></i> Catégories</a></li>
+                        <li><a href="{% url 'afficher_panier' %}" class="text-muted text-decoration-none"><i class="fas fa-chevron-right me-1"></i> Panier</a></li>
+                        <li><a href="{% url 'appeler_page_favorie' %}" class="text-muted text-decoration-none"><i class="fas fa-chevron-right me-1"></i> Favoris</a></li>
                     </ul>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <h5 class="fw-bold">Contact</h5>
-                    <ul class="list-unstyled">
+                    <h5 class="fw-bold mb-3">Contact</h5>
+                    <ul class="list-unstyled text-muted">
                         <li><i class="fas fa-envelope me-2"></i> contact@marche-virtuel.com</li>
                         <li><i class="fas fa-phone me-2"></i> +33 1 23 45 67 89</li>
+                        <li><i class="fas fa-map-marker-alt me-2"></i> Paris, France</li>
                     </ul>
                 </div>
             </div>
-            <hr class="my-4">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
-                <p class="mb-0">&copy; 2023 Marché Virtuel. Tous droits réservés.</p>
-                <div class="mt-2 mt-md-0">
-                    <a href="#" class="text-light me-3"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="text-light me-3"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="text-light"><i class="fab fa-instagram"></i></a>
+            <hr class="my-3">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center text-muted text-center">
+                <p class="mb-0">&copy; 2025 Marché Virtuel. Tous droits réservés.</p>
+                <div class="mt-3 mt-md-0">
+                    <a href="#" class="text-muted me-3 text-decoration-none"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-muted me-3 text-decoration-none"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-muted text-decoration-none"><i class="fab fa-instagram"></i></a>
                 </div>
             </div>
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    
-    <!-- Scripts personnalisés -->
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Gestion des messages avec timeout
+        // Auto-dismiss des alertes après 5 secondes
         document.addEventListener('DOMContentLoaded', function() {
-            // Auto-dismiss alerts after 5 seconds
             const alerts = document.querySelectorAll('.alert');
             alerts.forEach(function(alert) {
                 setTimeout(function() {
                     const bsAlert = new bootstrap.Alert(alert);
                     bsAlert.close();
                 }, 5000);
-            });
-            
-            // Active le lien de navigation courant
-            const currentUrl = window.location.pathname;
-            document.querySelectorAll('.nav-link').forEach(link => {
-                if (link.getAttribute('href') === currentUrl) {
-                    link.classList.add('active');
-                }
             });
         });
     </script>

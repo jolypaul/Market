@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Historique des paiements</h1>
+<table>
+  <tr>
+    <th>Référence</th>
+    <th>Montant</th>
+    <th>Statut</th>
+    <th>Type</th>
+    <th>Date</th>
+    <th>Actions</th>
+  </tr>
+  {% for paiement in paiements %}
+    <tr>
+      <td>{{ paiement.reference }}</td>
+      <td>{{ paiement.montant }}</td>
+      <td>{{ paiement.statut }}</td>
+      <td>{{ paiement.type_paiement }}</td>
+      <td>{{ paiement.date_paiement }}</td>
+      <td><a href="{% url 'detail_paiement' paiement.id %}">Détails</a></td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="6">Aucun paiement trouvé.</td></tr>
+  {% endfor %}
+</table>
+
+{% endblock %}

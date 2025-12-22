@@ -47,4 +47,4 @@ class EvaluationLivraison(models.Model):
         verbose_name_plural = 'Évaluations Livraisons'
         ordering = ['livraison__date_livraison']
 
-# Creation d'une classe pour les notifications de livraison
+

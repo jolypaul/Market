@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Historique des commandes</h1>
+<ul>
+  {% for commande in commandes %}
+    <li>Commande #{{ commande.id }} — {{ commande.statut }} — {{ commande.date_commande }}</li>
+  {% empty %}
+    <li>Aucun historique.</li>
+  {% endfor %}
+</ul>
+
+{% endblock %}

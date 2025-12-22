@@ -34,14 +34,13 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'rest_framework',
-    'rest_framework_simplejwt.token_blacklist', 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
     'Authentification',
     'Commande',
     'Favoris',
@@ -49,6 +48,7 @@ INSTALLED_APPS = [
     'Livraison',
     'Notification',
     'Paiement',
+    'Panier',
     'Publication',
 
 ]
@@ -129,13 +129,19 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-# config email
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'zikemstephane@gmail.com'
-EMAIL_HOST_PASSWORD = 'znghyeokurdjdrea'
+# Email configuration
+# In development: use console backend (prints emails to console)
+# In production: switch to SMTP backend
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    # Production SMTP config (without deprecated SSL keyfile/certfile)
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.gmail.com'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = 'zikemstephane@gmail.com'
+    EMAIL_HOST_PASSWORD = 'znghyeokurdjdrea'
 
 
 # Static files (CSS, JavaScript, Images)

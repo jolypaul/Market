@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Détails du paiement</h1>
+<p>Référence : {{ paiement.reference }}</p>
+<p>Montant : {{ paiement.montant }} FCFA</p>
+<p>Statut : {{ paiement.statut }}</p>
+<p>Type : {{ paiement.type_paiement }}</p>
+<p>Date : {{ paiement.date_paiement }}</p>
+<p>Commande : <a href="{% url 'detail_commande' paiement.commande.id %}">{{ paiement.commande.id }}</a></p>
+
+{% endblock %}

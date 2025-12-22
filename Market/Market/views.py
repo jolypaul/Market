@@ -3,6 +3,7 @@ from GestionProduits.models import Categorie,Produit
 from Favoris.models import Favori
 from django.contrib import messages
 from Authentification.models import Commercant,Client,Utilisateur
+from Publication.models import Publication
 
 def login(request):
     request.session.flush()
@@ -34,7 +35,8 @@ def page_produits(request):
         return render(request,'login.html',{'messages':messages.error})
     else:
         produits = Produit.objects.all()
-        return render(request, 'page_produits.html', {'produits': produits})
+        categories = Categorie.objects.all()
+        return render(request, 'page_produits.html', {'produits': produits, 'categories': categories})
 
 
 def form_modifier_produit(request,id):
@@ -50,3 +52,9 @@ def appeler_page_favorie(request):
         produit= Produit.objects.all()
         #favories = Favori.objects.filter(client__id=request.session.get('user_id'))
         return render(request,'favoris.html',{'produits':produit})
+
+
+def home(request):
+    # page d'accueil : afficher les publications (home == page des publications)
+    publications = Publication.objects.all().order_by('-date_publication')
+    return render(request, 'afficher_publications.html', {'publications': publications})

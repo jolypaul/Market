@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Mon panier</h1>
+
+{% if produits %}
+  <table>
+    <tr>
+      <th>Produit</th>
+      <th>Quantité</th>
+      <th>Prix</th>
+      <th>Sous-total</th>
+      <th>Actions</th>
+    </tr>
+    {% for item in produits %}
+      <tr>
+        <td>{{ item.produit.nom }}</td>
+        <td>
+          <form method="post" action="{% url 'mettre_a_jour_quantite' item.produit.id %}" style="display:inline;">
+            {% csrf_token %}
+            <input type="number" name="quantite" value="{{ item.quantite }}" min="1">
+            <button type="submit">Maj</button>
+          </form>
+        </td>
+        <td>{{ item.produit.prix }} FCFA</td>
+        <td>{{ item.sous_total }} FCFA</td>
+        <td><a href="{% url 'supprimer_du_panier' item.produit.id %}">Supprimer</a></td>
+      </tr>
+    {% endfor %}
+  </table>
+  
+  <p><strong>Total : {{ total }} FCFA</strong></p>
+  
+  <a href="{% url 'passer_commande' %}">Passer la commande</a>
+  <a href="{% url 'vider_panier' %}">Vider le panier</a>
+{% else %}
+  <p>Votre panier est vide.</p>
+{% endif %}
+
+{% endblock %}

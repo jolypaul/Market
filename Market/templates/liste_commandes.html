@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Mes commandes</h1>
+<ul>
+  {% for commande in commandes %}
+    <li><a href="{% url 'detail_commande' commande.id %}">Commande #{{ commande.id }}</a> — {{ commande.statut }} — {{ commande.date_commande }}</li>
+  {% empty %}
+    <li>Aucune commande trouvée.</li>
+  {% endfor %}
+</ul>
+
+{% endblock %}

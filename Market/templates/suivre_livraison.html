@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Suivi de la livraison #{{ livraison.id }}</h1>
+<p>Statut : {{ livraison.statut }}</p>
+<p>Adresse : {{ livraison.adresse_livraison }}</p>
+<p>Date : {{ livraison.date_livraison }}</p>
+<p>Livreur : {{ livraison.livreur.utilisateur.nom }}</p>
+
+{% endblock %}

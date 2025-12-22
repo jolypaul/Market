@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Payer la commande #{{ commande.id }}</h1>
+<p>Montant : {{ commande.total }} FCFA</p>
+
+<form method="post">
+  {% csrf_token %}
+  <label for="type_paiement">Mode de paiement :</label>
+  <select name="type_paiement" id="type_paiement" required>
+    <option value="carte">Carte</option>
+    <option value="paypal">PayPal</option>
+    <option value="virement">Virement</option>
+  </select>
+  <br>
+  <button type="submit">Continuer</button>
+</form>
+
+{% endblock %}

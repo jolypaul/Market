@@ -29,6 +29,8 @@ class NotificationCommande(models.Model):
         verbose_name = 'Notification Commande'
         verbose_name_plural = 'Notifications Commandes'
         ordering = ['-date_creation']
+        
+        
 # Creation d'une classe pour les notifications de livraison
 class NotificationLivraison(models.Model):
     livraison = models.ForeignKey('Livraison.Livraison', on_delete=models.CASCADE)
@@ -44,7 +46,7 @@ class NotificationLivraison(models.Model):
         verbose_name_plural = 'Notifications Livraisons'
         ordering = ['-date_creation']
         
-    # Creation d'une classe pour les notifications de l'ajout produit
+    # Creation d'une classe pour les notifications de l'ajout produit par un admin ou un vendeur
 class NotificationProduit(models.Model):
     produit = models.ForeignKey('GestionProduits.Produit', on_delete=models.CASCADE)
     message = models.TextField()

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Accueil - Marché Virtuel{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <h1 class="display-4 fw-bold mb-3">Bienvenue sur Marché Virtuel</h1>
+    <p class="lead text-muted">Votre plateforme d'achat et de vente en ligne</p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-6 col-lg-3">
+      <div class="card h-100 shadow-sm border-0 text-center">
+        <div class="card-body">
+          <i class="fas fa-box fa-3x text-primary mb-3"></i>
+          <h5 class="card-title">Produits</h5>
+          <a href="{% url 'liste_produits' %}" class="btn btn-primary btn-sm">Parcourir</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+      <div class="card h-100 shadow-sm border-0 text-center">
+        <div class="card-body">
+          <i class="fas fa-shopping-cart fa-3x text-success mb-3"></i>
+          <h5 class="card-title">Mon Panier</h5>
+          <a href="{% url 'afficher_panier' %}" class="btn btn-success btn-sm">Voir</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+      <div class="card h-100 shadow-sm border-0 text-center">
+        <div class="card-body">
+          <i class="fas fa-truck fa-3x text-warning mb-3"></i>
+          <h5 class="card-title">Livraisons</h5>
+          <a href="{% url 'afficher_livraisons' %}" class="btn btn-warning btn-sm">Suivi</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+      <div class="card h-100 shadow-sm border-0 text-center">
+        <div class="card-body">
+          <i class="fas fa-bell fa-3x text-danger mb-3"></i>
+          <h5 class="card-title">Notifications</h5>
+          <a href="{% url 'afficher_notifications' %}" class="btn btn-danger btn-sm">Voir</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

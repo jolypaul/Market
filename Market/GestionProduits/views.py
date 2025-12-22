@@ -84,7 +84,8 @@ def crate_produit(request):
     return render(request, "produit_form.html", {"ensemble": ensemble})
 def liste_produits(request):
     produits = Produit.objects.all()
-    return render(request, 'liste_produits.html', {'produits': produits})
+    categories = Categorie.objects.all()
+    return render(request, 'page_produits.html', {'produits': produits, 'categories': categories})
 
 def detail_produit(request, produit_id):
     try:
