@@ -208,6 +208,27 @@ def confirmer_paiement(request, paiement_id):
         }, status=500)
 
 
+def liste_paiements(request):
+    """Liste des paiements du client"""
+    if request.session.get('role') != 'client':
+        messages.error(request, "Accès refusé")
+        return redirect('login')
+
+    user_id = request.session.get('user_id')
+    try:
+        client = Client.objects.get(utilisateur_id=user_id)
+    except Client.DoesNotExist:
+        messages.error(request, "Client non trouvé")
+        return redirect('Dashboard_client')
+
+    paiements = Paiement.objects.filter(client=client).order_by('-date_paiement')
+    context = {
+        'paiements': paiements,
+        'layout': 'base_client.html'
+    }
+    return render(request, 'liste_paiements.html', context)
+
+
 def paiement_succes(request):
     """Page de succès de paiement"""
     paiement_id = request.GET.get('paiement_id')

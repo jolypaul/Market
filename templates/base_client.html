@@ -47,7 +47,7 @@
                     <i class="fas fa-tachometer-alt"></i>
                     Tableau de bord
                 </a>
-                <a href="" class="nav-item {% if request.resolver_match.url_name == 'mes_commandes' %}active{% endif %}">
+                <a href="{% url 'liste_commandes' %}" class="nav-item {% if request.resolver_match.url_name == 'liste_commandes' %}active{% endif %}">
                     <i class="fas fa-shopping-bag"></i>
                     Mes commandes
                     <span class="badge bg-primary">5</span>
@@ -61,20 +61,12 @@
                     <i class="fas fa-user"></i>
                     Mon profil
                 </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-map-marker-alt"></i>
-                    Adresses
-                </a>
                 <a href="{%url 'tout_les_produits'%}" class="nav-item">
                     <i class="fas fa-map-marker-alt"></i>
                     Produits
                 </a>
-                <a href="{% url 'vue_panier' %}" class="nav-item">
-                    <i class="fas fa-shopping-cart"></i>
-                    Voir le panier
-                    <span class="badge bg-primary cart-count-badge" style="display:none; margin-left:auto;">0</span>
-                </a>
-                <a href="#" class="nav-item">
+
+                <a href="{% url 'liste_paiements' %}" class="nav-item {% if request.resolver_match.url_name == 'liste_paiements' %}active{% endif %}">
                     <i class="fas fa-credit-card"></i>
                     Paiements
                 </a>
@@ -82,11 +74,7 @@
                     <i class="fas fa-star"></i>
                     Avis & Notes
                 </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-bell"></i>
-                    Notifications
-                    <span class="badge bg-warning">3</span>
-                </a>
+
                 <div class="sidebar-footer">
                     <a href="{% url 'login' %}" class="nav-item text-danger">
                         <i class="fas fa-sign-out-alt"></i>

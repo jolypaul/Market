@@ -22,9 +22,9 @@
             <div class="stat-icon success">
                 <i class="fas fa-shipping-fast"></i>
             </div>
-            <div class="stat-value">28</div>
-            <div class="stat-label">Livraisons ce mois</div>
-            <small class="text-success">Objectif: 30/30</small>
+            <div class="stat-value">{{ commandes_a_livrer }}</div>
+            <div class="stat-label">Livraisons en cours/ce mois</div>
+            <small class="text-success">Statistiques réelles</small>
         </div>
         
         <div class="stat-card">
@@ -217,9 +217,9 @@
                     <div class="d-flex justify-content-between align-items-center mb-3 p-3 border rounded">
                         <div>
                             <h6 class="mb-0">Livraisons effectuées</h6>
-                            <small class="text-muted">Sur 12 prévues</small>
+                            <small class="text-muted">Sur prévues</small>
                         </div>
-                        <span class="stat-value text-success">8</span>
+                        <span class="stat-value text-success">{{ commandes_livre }}</span>
                     </div>
                     
                     <div class="d-flex justify-content-between align-items-center mb-3 p-3 border rounded">

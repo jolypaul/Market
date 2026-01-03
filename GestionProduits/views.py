@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Categorie,Produit
 from django.contrib import messages
+from django.db.models.deletion import ProtectedError
 from Authentification.models import Commercant,Client
 
 # Create your views here.
@@ -31,6 +32,10 @@ def crate_produit(request):
    #     messages.error(request, "Vous devez vous connecter.")
    #     return render(request,'login.html',{'messages':messages})
    # ele:
+    ensemble = Categorie.objects.all()
+    commercant_nom_connecter = Commercant.objects.get(utilisateur__email=request.session.get('email'))
+    comerce = Commercant.objects.filter(id=commercant_nom_connecter.id)
+    
     if request.method == 'POST':
         nom = request.POST.get('nom')
         description = request.POST.get('description')
@@ -39,35 +44,32 @@ def crate_produit(request):
         quantite_en_stock = request.POST.get('quantite_en_stock')
         categorie_id = request.POST.get('categorie_id')
         commerçant_id = request.POST.get('Commercant_id')
-        ensemble = Categorie.objects.all() 
+        
+        context = {
+            'ensemble': ensemble,
+            'commercant_nom_connecter': commercant_nom_connecter,
+            'comerce': comerce
+        }
+        
         if not nom or not prix or not quantite_en_stock or not categorie_id:
-            return render(request, 'produit_form.html', {
-                'ensemble': ensemble,
-                'error': 'Tous les champs obligatoires doivent être remplis.'
-            })
+            context['error'] = 'Tous les champs obligatoires doivent être remplis.'
+            return render(request, 'produit_form.html', context)
         try:
             prix = float(prix)
             quantite_en_stock = int(quantite_en_stock)
         except:
-            return render(request, 'produit_form.html', {
-                'ensemble': ensemble,
-                'error': 'Le prix et la quantité doivent être des valeurs numériques.'
-            })
+            context['error'] = 'Le prix et la quantité doivent être des valeurs numériques.'
+            return render(request, 'produit_form.html', context)
         if prix <= 0:
-            return render(request, 'produit_form.html', {
-                'ensemble': ensemble,
-                'error': 'Le prix doit être supérieur à 0.'
-            })
+            context['error'] = 'Le prix doit être supérieur à 0.'
+            return render(request, 'produit_form.html', context)
         if quantite_en_stock < 0:
-            return render(request, 'produit_form.html', {
-                'ensemble': ensemble,
-                'error': 'La quantité ne peut pas être négative.'
-            })
+            context['error'] = 'La quantité ne peut pas être négative.'
+            return render(request, 'produit_form.html', context)
         if Produit.objects.filter(nom=nom, categorie_id=categorie_id).exists():
-            return render(request, 'produit_form.html', {
-                'ensemble': ensemble,
-                'error': 'Ce produit existe déjà.'
-            })
+            context['error'] = 'Ce produit existe déjà.'
+            return render(request, 'produit_form.html', context)
+        
         produit = Produit(
             nom=nom,
             description=description,
@@ -78,11 +80,14 @@ def crate_produit(request):
             Commercant_id_id=commerçant_id
         )
         produit.save()
-        return render(request, 'produit_form.html', {
-            'ensemble': ensemble,
-            'success': 'Produit ajouté avec succès.'
-        })
-    return render(request, "produit_form.html", {"ensemble": ensemble})
+        context['success'] = 'Produit ajouté avec succès.'
+        return render(request, 'produit_form.html', context)
+    
+    return render(request, "produit_form.html", {
+        'ensemble': ensemble,
+        'commercant_nom_connecter': commercant_nom_connecter,
+        'comerce': comerce
+    })
 def liste_produits(request):
     produits = Produit.objects.all()
     return render(request, 'liste_produits.html', {'produits': produits})
@@ -120,10 +125,16 @@ def supprimer_produit(request, produit_id):
         produit = Produit.objects.get(id=produit_id)
         produit.delete()
         produits = Produit.objects.all()
-        return render(request, 'page_produits.html', {'produits': produits, 'success': 'Produit supprimé avec succès.'})
+        messages.success(request, 'Produit supprimé avec succès.')
+        return render(request, 'page_produits.html', {'produits': produits})
+    except ProtectedError:
+        produits = Produit.objects.all()
+        messages.error(request, 'Impossible de supprimer ce produit car il est référencé dans une ou plusieurs commandes. Veuillez d\'abord supprimer les commandes associées.')
+        return render(request, 'page_produits.html', {'produits': produits})
     except Produit.DoesNotExist:
         produits = Produit.objects.all()
-        return render(request, 'register.html', {'produits': produits, 'error': 'Produit non trouvé.'})
+        messages.error(request, 'Produit non trouvé.')
+        return render(request, 'page_produits.html', {'produits': produits})
     
 def modifier_categorie(request, categories_id):
     categorie = get_object_or_404(Categorie, id=categories_id)

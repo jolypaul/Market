@@ -13,36 +13,36 @@
             <div class="stat-icon primary">
                 <i class="fas fa-money-bill-wave"></i>
             </div>
-            <div class="stat-value">€2,450</div>
+            <div class="stat-value">{{ chiffre_affaires }} FCFA</div>
             <div class="stat-label">Chiffre d'affaires</div>
-            <small class="text-success"><i class="fas fa-arrow-up"></i> 15% ce mois</small>
+            <small class="text-success"><i class="fas fa-arrow-up"></i> Statistiques réelles</small>
         </div>
         
         <div class="stat-card">
             <div class="stat-icon success">
                 <i class="fas fa-shopping-bag"></i>
             </div>
-            <div class="stat-value">156</div>
+            <div class="stat-value">{{ commandes_count }}</div>
             <div class="stat-label">Commandes totales</div>
-            <small class="text-success"><i class="fas fa-arrow-up"></i> 12% ce mois</small>
+            <small class="text-success"><i class="fas fa-arrow-up"></i> Statistiques réelles</small>
         </div>
         
         <div class="stat-card">
             <div class="stat-icon warning">
                 <i class="fas fa-box"></i>
             </div>
-            <div class="stat-value">42</div>
+            <div class="stat-value">{{ produits_count }}</div>
             <div class="stat-label">Produits en stock</div>
-            <small class="text-warning">8 en rupture</small>
+            <small class="text-warning">Vérifiez les ruptures</small>
         </div>
         
         <div class="stat-card">
             <div class="stat-icon info">
                 <i class="fas fa-star"></i>
             </div>
-            <div class="stat-value">4.7</div>
+            <div class="stat-value">{{ avg_commercant|default:'-' }}</div>
             <div class="stat-label">Note moyenne</div>
-            <small class="text-info">48 avis clients</small>
+            <small class="text-info">Basé sur avis clients</small>
         </div>
     </div>
 
@@ -81,34 +81,17 @@
                             </tr>
                         </thead>
                         <tbody>
+                        {% for co in recent_orders_commercant %}
                             <tr>
-                                <td>#CMD-0156</td>
-                                <td>Marie Dupont</td>
-                                <td>€85.50</td>
-                                <td><span class="order-status status-delivered">Livrée</span></td>
-                                <td>15 Jan 2024</td>
+                                <td>#CMD-{{ co.id }}</td>
+                                <td>{{ co.client.utilisateur.nom }}</td>
+                                <td>{{ co.total }} FCFA</td>
+                                <td><span class="order-status {% if co.statut == "livree" %}status-delivered{% elif co.statut == "en_attente" or co.statut == "en_cours" %}status-processing{% endif %}">{{ co.get_statut_display }}</span></td>
+                                <td>{{ co.date_commande }}</td>
                             </tr>
-                            <tr>
-                                <td>#CMD-0155</td>
-                                <td>Pierre Martin</td>
-                                <td>€42.00</td>
-                                <td><span class="order-status status-processing">En cours</span></td>
-                                <td>14 Jan 2024</td>
-                            </tr>
-                            <tr>
-                                <td>#CMD-0154</td>
-                                <td>Sophie Bernard</td>
-                                <td>€120.75</td>
-                                <td><span class="order-status status-pending">En attente</span></td>
-                                <td>14 Jan 2024</td>
-                            </tr>
-                            <tr>
-                                <td>#CMD-0153</td>
-                                <td>Jean Dubois</td>
-                                <td>€65.30</td>
-                                <td><span class="order-status status-delivered">Livrée</span></td>
-                                <td>13 Jan 2024</td>
-                            </tr>
+                        {% empty %}
+                            <tr><td colspan="5" class="text-muted">Aucune commande récente.</td></tr>
+                        {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -121,49 +104,20 @@
                     <h3 class="table-title">Produits populaires</h3>
                 </div>
                 <div class="p-3">
+                    {% for p in top_products %}
                     <div class="d-flex align-items-center mb-3 p-2 border rounded">
                         <div class="product-icon bg-success text-white rounded p-2 me-3">
-                            <i class="fas fa-apple-alt"></i>
+                            <i class="fas fa-box"></i>
                         </div>
                         <div class="flex-grow-1">
-                            <h6 class="mb-0">Pommes Bio</h6>
-                            <small class="text-muted">Ventes: 156 unités</small>
+                            <h6 class="mb-0">{{ p.produit__nom }}</h6>
+                            <small class="text-muted">Ventes: {{ p.qty }} unités</small>
                         </div>
                         <span class="stock-status stock-high">En stock</span>
                     </div>
-                    
-                    <div class="d-flex align-items-center mb-3 p-2 border rounded">
-                        <div class="product-icon bg-primary text-white rounded p-2 me-3">
-                            <i class="fas fa-wine-bottle"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <h6 class="mb-0">Lait entier</h6>
-                            <small class="text-muted">Ventes: 89 unités</small>
-                        </div>
-                        <span class="stock-status stock-medium">Stock bas</span>
-                    </div>
-                    
-                    <div class="d-flex align-items-center mb-3 p-2 border rounded">
-                        <div class="product-icon bg-warning text-white rounded p-2 me-3">
-                            <i class="fas fa-bread-slice"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <h6 class="mb-0">Pain complet</h6>
-                            <small class="text-muted">Ventes: 67 unités</small>
-                        </div>
-                        <span class="stock-status stock-low">Rupture</span>
-                    </div>
-                    
-                    <div class="d-flex align-items-center p-2 border rounded">
-                        <div class="product-icon bg-info text-white rounded p-2 me-3">
-                            <i class="fas fa-cheese"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <h6 class="mb-0">Fromage Brie</h6>
-                            <small class="text-muted">Ventes: 45 unités</small>
-                        </div>
-                        <span class="stock-status stock-high">En stock</span>
-                    </div>
+                    {% empty %}
+                    <div class="text-muted">Aucun produit vendu récemment.</div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -215,13 +169,15 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Sales Chart
     const salesCtx = document.getElementById('salesChart').getContext('2d');
+    const salesDays = {{ sales_days_json|safe }} || ['1', '2', '3'];
+    const salesData = {{ sales_daily_json|safe }} || [120, 150, 180];
     const salesChart = new Chart(salesCtx, {
         type: 'bar',
         data: {
-            labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30'],
+            labels: salesDays,
             datasets: [{
-                label: 'Ventes quotidiennes (€)',
-                data: [120, 150, 180, 90, 200, 160, 140, 170, 190, 210, 180, 160, 140, 170, 190, 220, 240, 200, 180, 160, 190, 210, 230, 250, 220, 200, 180, 190, 210, 230],
+                label: 'Ventes quotidiennes (FCFA)',
+                data: salesData,
                 backgroundColor: '#ff6b6b',
                 borderColor: '#ff6b6b',
                 borderWidth: 1
@@ -252,12 +208,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Categories Chart
     const categoriesCtx = document.getElementById('categoriesChart').getContext('2d');
+    const categoriesLabels = {{ categories_top_json|safe }} || ['Alimentation', 'Électronique'];
+    const categoriesData = {{ categories_data_json|safe }} || [35, 25];
     const categoriesChart = new Chart(categoriesCtx, {
         type: 'doughnut',
         data: {
-            labels: ['Fruits & Légumes', 'Produits Laitiers', 'Boulangerie', 'Viandes', 'Boissons'],
+            labels: categoriesLabels,
             datasets: [{
-                data: [35, 25, 20, 12, 8],
+                data: categoriesData,
                 backgroundColor: [
                     '#ff6b6b',
                     '#feca57',

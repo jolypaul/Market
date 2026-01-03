@@ -4,6 +4,7 @@ from .views import (
     confirmer_paiement,
     paiement_succes,
     paiement_erreur,
+    liste_paiements,
 )
 
 urlpatterns = [
@@ -11,4 +12,5 @@ urlpatterns = [
     path('confirmer/<uuid:paiement_id>/', confirmer_paiement, name='confirmer_paiement'),
     path('succes/', paiement_succes, name='paiement_succes'),
     path('erreur/', paiement_erreur, name='paiement_erreur'),
+    path('liste/', liste_paiements, name='liste_paiements'),
 ]
