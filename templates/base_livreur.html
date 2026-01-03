@@ -1,0 +1,726 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <meta name="description" content="Dashboard Livreur - Marché Virtuel">
+    <title>{% block title %}Dashboard Livreur - Marché Virtuel{% endblock %}</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body class="dashboard-livreur">
+    <!-- Sidebar -->
+    <div class="dashboard-container">
+        <div class="sidebar-livreur">
+            <div class="sidebar-header">
+                <a class="navbar-brand fw-bold text-white d-flex align-items-center" href="/">
+                    <i class="fas fa-motorcycle me-2"></i>
+                    Marché Virtuel
+                </a>
+                <div class="user-info">
+                    {% if utilisateur.image %}
+                        <img src="{{ utilisateur.image.url }}" alt="Photo de profil" class="user-avatar">
+                    {% else %}
+                        <div class="user-avatar-placeholder">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    {% endif %}
+                    <div class="user-details">
+                        <strong>{{ utilisateur.nom }}</strong>
+                        <small>Livreur</small>
+                        {% if livreur.zone_de_livraison %}
+                            <div class="zone-name">{{ livreur.zone_de_livraison }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="status-indicator">
+                    <div class="status online">
+                        <i class="fas fa-circle"></i>
+                        En ligne
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="{% url 'Dashboard_Livreur' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard_livreur' %}active{% endif %}">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Tableau de bord
+                </a>
+                <a href="#" class="nav-item {% if request.resolver_match.url_name == 'livraisons_livreur' %}active{% endif %}">
+                    <i class="fas fa-shipping-fast"></i>
+                    Livraisons
+                    <span class="badge bg-primary">8</span>
+                </a>
+                <a href="#" class="nav-item {% if request.resolver_match.url_name == 'livraisons_en_cours' %}active{% endif %}">
+                    <i class="fas fa-road"></i>
+                    En cours
+                    <span class="badge bg-warning">2</span>
+                </a>
+                <a href="#" class="nav-item {% if request.resolver_match.url_name == 'historique_livraisons' %}active{% endif %}">
+                    <i class="fas fa-history"></i>
+                    Historique
+                </a>
+                <a href="#" class="nav-item {% if request.resolver_match.url_name == 'revenus_livreur' %}active{% endif %}">
+                    <i class="fas fa-money-bill-wave"></i>
+                    Revenus
+                </a>
+                <a href="#" class="nav-item {% if request.resolver_match.url_name == 'performance_livreur' %}active{% endif %}">
+                    <i class="fas fa-chart-line"></i>
+                    Performance
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-map-marked-alt"></i>
+                    Zones
+                </a>
+                <a href="{% url 'call_profil' %}" class="nav-item {% if request.resolver_match.url_name == 'call_profil' %}active{% endif %}">
+                    <i class="fas fa-user"></i>
+                    Mon profil
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    Paramètres
+                </a>
+                <div class="sidebar-footer">
+                    <button class="nav-item status-toggle" id="statusToggle">
+                        <i class="fas fa-power-off"></i>
+                        <span>Se déconnecter</span>
+                    </button>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content-livreur">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="sidebar-toggle btn btn-light">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="page-title">{% block page_title %}Tableau de bord{% endblock %}</h1>
+                </div>
+                <div class="header-right">
+                    <div class="status-badge">
+                        <span class="badge bg-success">
+                            <i class="fas fa-circle me-1"></i>
+                            En ligne
+                        </span>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-light position-relative">
+                            <i class="fas fa-bell"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
+                                3
+                            </span>
+                        </button>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-bolt me-1"></i>
+                            Mode Express
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Messages -->
+            <div class="container-fluid mt-3">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Toggle sidebar on mobile
+        document.querySelector('.sidebar-toggle').addEventListener('click', function() {
+            document.querySelector('.dashboard-container').classList.toggle('sidebar-collapsed');
+        });
+
+        // Status toggle
+        document.getElementById('statusToggle').addEventListener('click', function() {
+            const statusBadge = document.querySelector('.status-badge .badge');
+            const statusIndicator = document.querySelector('.status-indicator .status');
+            const statusText = this.querySelector('span');
+            
+            if (statusBadge.classList.contains('bg-success')) {
+                // Go offline
+                statusBadge.className = 'badge bg-secondary';
+                statusBadge.innerHTML = '<i class="fas fa-circle me-1"></i>Hors ligne';
+                statusIndicator.className = 'status offline';
+                statusIndicator.innerHTML = '<i class="fas fa-circle"></i>Hors ligne';
+                statusText.textContent = 'Se connecter';
+                this.classList.add('offline');
+            } else {
+                // Go online
+                statusBadge.className = 'badge bg-success';
+                statusBadge.innerHTML = '<i class="fas fa-circle me-1"></i>En ligne';
+                statusIndicator.className = 'status online';
+                statusIndicator.innerHTML = '<i class="fas fa-circle"></i>En ligne';
+                statusText.textContent = 'Se déconnecter';
+                this.classList.remove('offline');
+            }
+        });
+
+        // Auto-dismiss alerts
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                setTimeout(function() {
+                    if (alert && alert.classList.contains('show')) {
+                        const bsAlert = new bootstrap.Alert(alert);
+                        bsAlert.close();
+                    }
+                }, 5000);
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+
+<style>
+.dashboard-livreur {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar Styles */
+.sidebar-livreur {
+    width: 280px;
+    background: linear-gradient(135deg, #1e9b9b 0%, #2d8ba1 100%);
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+
+.sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+    gap: 12px;
+}
+
+.user-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255,255,255,0.2);
+}
+
+.user-avatar-placeholder {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    border: 3px solid rgba(255,255,255,0.2);
+}
+
+.user-details {
+    flex: 1;
+}
+
+.user-details strong {
+    display: block;
+    font-size: 16px;
+}
+
+.user-details small {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.zone-name {
+    font-size: 11px;
+    opacity: 0.9;
+    font-style: italic;
+    margin-top: 2px;
+}
+
+.status-indicator {
+    margin-top: 15px;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 15px;
+    background: rgba(255,255,255,0.1);
+}
+
+.status.online i {
+    color: #4caf50;
+}
+
+.status.offline i {
+    color: #f44336;
+}
+
+.sidebar-nav {
+    padding: 20px 0;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.nav-item:hover {
+    background: rgba(255,255,255,0.1);
+    border-left-color: rgba(255,255,255,0.3);
+}
+
+.nav-item.active {
+    background: rgba(255,255,255,0.15);
+    border-left-color: #fff;
+}
+
+.nav-item .badge {
+    margin-left: auto;
+}
+
+.sidebar-footer {
+    margin-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 20px;
+}
+
+.status-toggle.offline {
+    color: #4caf50 !important;
+}
+
+/* Main Content Styles */
+.main-content-livreur {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.top-header {
+    background: white;
+    padding: 15px 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.sidebar-toggle {
+    display: none;
+}
+
+.page-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+    color: #2c3e50;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.status-badge .badge {
+    font-size: 12px;
+    padding: 8px 12px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.main-content {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+/* Stats Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    border-left: 4px solid #1e9b9b;
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.stat-icon.primary { background: #e0f2f1; color: #1e9b9b; }
+.stat-icon.success { background: #e8f5e8; color: #2e7d32; }
+.stat-icon.warning { background: #fff3e0; color: #f57c00; }
+.stat-icon.info { background: #e3f2fd; color: #1976d2; }
+.stat-icon.danger { background: #fdeaea; color: #dc3545; }
+
+.stat-value {
+    font-size: 2em;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    color: #6c757d;
+    font-size: 14px;
+}
+
+/* Current Delivery */
+.current-delivery {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.delivery-header {
+    background: linear-gradient(135deg, #1e9b9b 0%, #2d8ba1 100%);
+    color: white;
+    padding: 20px 25px;
+    display: flex;
+    justify-content: between;
+    align-items: center;
+}
+
+.delivery-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.delivery-urgency {
+    background: rgba(255,255,255,0.2);
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.delivery-content {
+    padding: 25px;
+}
+
+.delivery-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info-label {
+    font-size: 12px;
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.info-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.delivery-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Progress Steps */
+.delivery-progress {
+    margin: 25px 0;
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.progress-steps::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #e9ecef;
+    z-index: 1;
+}
+
+.progress-bar {
+    position: absolute;
+    top: 15px;
+    left: 0;
+    height: 3px;
+    background: #1e9b9b;
+    z-index: 2;
+    transition: width 0.3s ease;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 3;
+    position: relative;
+}
+
+.step-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.step.active .step-icon {
+    background: #1e9b9b;
+    color: white;
+}
+
+.step.completed .step-icon {
+    background: #4caf50;
+    color: white;
+}
+
+.step-label {
+    font-size: 12px;
+    color: #6c757d;
+    text-align: center;
+}
+
+.step.active .step-label {
+    color: #1e9b9b;
+    font-weight: 600;
+}
+
+/* Charts Section */
+.charts-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.chart-container {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.chart-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+/* Recent Deliveries */
+.recent-deliveries {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+
+.table-header {
+    padding: 20px 25px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.table-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    color: #2c3e50;
+}
+
+.delivery-status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-delivered { background: #d4edda; color: #155724; }
+.status-pending { background: #fff3cd; color: #856404; }
+.status-picked { background: #cce7ff; color: #004085; }
+.status-cancelled { background: #f8d7da; color: #721c24; }
+
+/* Quick Actions */
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.action-btn {
+    background: white;
+    border: 2px dashed #dee2e6;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    text-decoration: none;
+    color: #6c757d;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.action-btn:hover {
+    border-color: #1e9b9b;
+    color: #1e9b9b;
+    transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+    
+    .sidebar-livreur {
+        width: 100%;
+        position: fixed;
+        z-index: 1000;
+        height: 100vh;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .dashboard-container.sidebar-collapsed .sidebar-livreur {
+        transform: translateX(0);
+    }
+    
+    .sidebar-toggle {
+        display: block;
+    }
+    
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .delivery-info {
+        grid-template-columns: 1fr;
+    }
+    
+    .delivery-actions {
+        grid-template-columns: 1fr;
+    }
+    
+    .top-header {
+        padding: 15px 20px;
+    }
+    
+    .main-content {
+        padding: 20px;
+    }
+    
+    .quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .progress-steps {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+}
+</style>

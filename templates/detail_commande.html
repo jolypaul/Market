@@ -1,0 +1,427 @@
+{% extends layout %}
+
+{% block title %}Détails de la Commande - Marché Virtuel{% endblock %}
+
+{% block content %}
+<div class="order-detail-container">
+    <div class="order-header">
+        <h1>Commande #{{ commande.id }}</h1>
+        <span class="badge badge-{{ commande.statut }}">
+            {{ commande.get_statut_display }}
+        </span>
+    </div>
+    
+    {% if messages %}
+        <div class="alert-container">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <div class="order-grid">
+        <!-- Informations principales -->
+        <div class="order-info-section">
+            <div class="info-card">
+                <h2>Informations de la Commande</h2>
+                <div class="info-items">
+                    <div class="info-item">
+                        <span class="label">Date de Commande</span>
+                        <span class="value">{{ commande.date_commande|date:"d/m/Y H:i" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Statut</span>
+                        <span class="value badge badge-{{ commande.statut }}">
+                            {{ commande.get_statut_display }}
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Numéro de Suivi</span>
+                        <span class="value">
+                            {% if commande.statut in "expediee,livree" %}
+                                <strong>À venir</strong>
+                            {% else %}
+                                <em>Non disponible</em>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-card">
+                <h2>Adresse de Livraison</h2>
+                <div class="address-box">
+                    <p>{{ commande.adresse_livraison }}</p>
+                </div>
+            </div>
+            
+            {% if commande.notes %}
+            <div class="info-card">
+                <h2>Notes</h2>
+                <p>{{ commande.notes }}</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Articles et totaux -->
+        <div class="order-items-section">
+            <div class="items-card">
+                <h2>Articles Commandés</h2>
+                <div class="items-table">
+                    <div class="items-header">
+                        <span class="col-name">Produit</span>
+                        <span class="col-qty">Quantité</span>
+                        <span class="col-price">Prix</span>
+                        <span class="col-total">Total</span>
+                    </div>
+                    
+                    {% for article in articles %}
+                    <div class="items-row">
+                        <div class="col-name">
+                            <strong>{{ article.produit.nom }}</strong>
+                            {% if article.produit.image %}
+                                <img src="{{ article.produit.image.url }}" alt="{{ article.produit.nom }}" class="product-thumb">
+                            {% endif %}
+                        </div>
+                        <div class="col-qty">{{ article.quantite }}</div>
+                        <div class="col-price">{{ article.prix_unitaire }} €</div>
+                        <div class="col-total"><strong>{{ article.sous_total }} €</strong></div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <h2>Résumé</h2>
+                <div class="summary-rows">
+                    <div class="summary-row">
+                        <span>Sous-total</span>
+                        <span>{{ commande.total }} €</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Frais de port</span>
+                        <span>Gratuit</span>
+                    </div>
+                    <div class="summary-row tax">
+                        <span>Taxes</span>
+                        <span>Incluses</span>
+                    </div>
+                    <div class="summary-row total">
+                        <strong>Total à Payer</strong>
+                        <strong>{{ commande.total }} €</strong>
+                    </div>
+                </div>
+                
+                {% if commande.statut in "en_attente,confirmee" %}
+                <div class="order-actions">
+                    <a href="{% url 'detail_commande' commande.id %}" class="btn btn-primary btn-block">
+                        Payer
+                    </a>
+                    <form method="post" action="{% url 'annuler_commande' commande.id %}" style="margin-top: 0.5rem;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger btn-block" 
+                                onclick="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?')">
+                            Annuler la Commande
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Timeline du statut -->
+    <div class="status-timeline">
+        <h2>Suivi de votre Commande</h2>
+        <div class="timeline">
+            <div class="timeline-item completed">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h4>Commande Confirmée</h4>
+                    <p>{{ commande.date_commande|date:"d/m/Y H:i" }}</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item {% if commande.statut in "en_cours,preparee,expediee,livree" %}completed{% endif %}">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h4>Préparation</h4>
+                    <p>Nous préparons votre colis</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item {% if commande.statut in "expediee,livree" %}completed{% endif %}">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h4>En Expédition</h4>
+                    <p>Votre colis est en route</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item {% if commande.statut == "livree" %}completed{% endif %}">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h4>Livré</h4>
+                    <p>Commande livrée avec succès</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Actions -->
+    <div class="actions-section">
+        <a href="{% url 'liste_commandes' %}" class="btn btn-outline">
+            Retour aux Commandes
+        </a>
+        <a href="{% url 'tout_les_produits' %}" class="btn btn-outline">
+            Continuer les Achats
+        </a>
+    </div>
+</div>
+
+<style>
+    .order-detail-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+    
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .order-header h1 {
+        margin: 0;
+    }
+    
+    .order-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    @media (max-width: 768px) {
+        .order-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .info-card,
+    .items-card,
+    .summary-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    h2 {
+        font-size: 1.2rem;
+        margin: 0 0 1.5rem 0;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #eee;
+    }
+    
+    .info-items {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .info-item .label {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .info-item .value {
+        color: #666;
+    }
+    
+    .address-box {
+        background: #f9f9f9;
+        padding: 1rem;
+        border-radius: 4px;
+        border-left: 4px solid #007bff;
+    }
+    
+    .address-box p {
+        margin: 0;
+        white-space: pre-wrap;
+        line-height: 1.6;
+    }
+    
+    .items-table {
+        background: #f9f9f9;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    
+    .items-header,
+    .items-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        padding: 1rem;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .items-header {
+        background: #eee;
+        font-weight: 600;
+        padding: 1rem;
+    }
+    
+    .items-row:last-child {
+        border-bottom: none;
+    }
+    
+    .col-name {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .product-thumb {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+    
+    .summary-rows {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem;
+        background: white;
+        border-radius: 4px;
+    }
+    
+    .summary-row.total {
+        background: #e8f4f8;
+        border: 2px solid #007bff;
+        font-size: 1.1rem;
+        color: #007bff;
+        font-weight: 600;
+    }
+    
+    .order-actions {
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #eee;
+    }
+    
+    .status-timeline {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 3rem;
+    }
+    
+    .timeline {
+        position: relative;
+        padding: 2rem 0;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 15px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #eee;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 2rem;
+        padding-left: 60px;
+    }
+    
+    .timeline-dot {
+        position: absolute;
+        left: 0;
+        top: 5px;
+        width: 32px;
+        height: 32px;
+        background: white;
+        border: 2px solid #ddd;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .timeline-item.completed .timeline-dot {
+        background: #28a745;
+        border-color: #28a745;
+        color: white;
+    }
+    
+    .timeline-item.completed .timeline-dot::after {
+        content: '✓';
+        font-weight: bold;
+    }
+    
+    .timeline-content h4 {
+        margin: 0 0 0.25rem 0;
+        font-size: 1rem;
+    }
+    
+    .timeline-content p {
+        margin: 0;
+        color: #999;
+        font-size: 0.9rem;
+    }
+    
+    .actions-section {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .alert-container {
+        margin-bottom: 2rem;
+    }
+    
+    .alert {
+        padding: 1rem;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+    }
+    
+    .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .alert-error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+</style>
+{% endblock %}

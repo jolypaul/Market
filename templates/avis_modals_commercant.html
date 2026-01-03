@@ -1,0 +1,35 @@
+<!-- templates/avis/modals_commercant.html -->
+<!-- Modal Réponse Commentaire -->
+<div class="modal fade" id="modalReponseCommentaire" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-reply me-2"></i>Répondre au Commentaire
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'creer_reponse_commentaire' %}">
+                {% csrf_token %}
+                <input type="hidden" name="commentaire_id" id="commentaire_id">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Commentaire du client</label>
+                        <div class="border rounded p-3 bg-light" id="commentaire_client">
+                            <!-- Le commentaire sera inséré ici par JavaScript -->
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Votre réponse</label>
+                        <textarea name="reponse" class="form-control" rows="4" required 
+                                  placeholder="Tapez votre réponse professionnelle ici..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-success">Envoyer la réponse</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

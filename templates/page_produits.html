@@ -1,0 +1,491 @@
+{% extends 'base_commercant.html' %}
+{% load static %}
+
+{% block title %}Liste des produits{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-radius: 0 0 20px 20px;
+    }
+    
+    .stats-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        border-left: 4px solid var(--primary-color);
+        transition: transform 0.3s ease;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stats-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        line-height: 1;
+    }
+    
+    .stats-label {
+        color: #6c757d;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .table-container {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+    
+    .table {
+        margin: 0;
+    }
+    
+    .table thead th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 1rem 1.5rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .table tbody td {
+        padding: 1rem 1.5rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f1f3f4;
+    }
+    
+    .table tbody tr {
+        transition: all 0.3s ease;
+    }
+    
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+        transform: scale(1.01);
+    }
+    
+    .product-image {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        object-fit: cover;
+        border: 2px solid #e9ecef;
+    }
+    
+    .stock-badge {
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .stock-low { background-color: #fee; color: #dc3545; border: 1px solid #f5c6cb; }
+    .stock-medium { background-color: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+    .stock-high { background-color: #e8f5e8; color: #155724; border: 1px solid #c3e6cb; }
+    
+    .price-tag {
+        font-weight: 700;
+        color: #2c5530;
+        background: #e8f5e8;
+        padding: 0.3rem 0.8rem;
+        border-radius: 15px;
+        font-size: 0.85rem;
+    }
+    
+    .btn-action {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+    }
+    
+    .btn-action i {
+        margin-right: 5px;
+    }
+    
+    .search-box {
+        position: relative;
+        max-width: 400px;
+    }
+    
+    .search-box input {
+        padding-left: 3rem;
+        border-radius: 25px;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+    
+    .search-box input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        z-index: 5;
+    }
+    
+    .filters-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #6c757d;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #dee2e6;
+        margin-bottom: 1rem;
+    }
+    
+    .pagination-container {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 0 0 15px 15px;
+        border-top: 1px solid #f1f3f4;
+    }
+    
+    .page-link {
+        border: none;
+        color: var(--primary-color);
+        padding: 0.5rem 1rem;
+        margin: 0 0.2rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .page-link:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    .page-item.active .page-link {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    @media (max-width: 768px) {
+        .table-container {
+            border-radius: 10px;
+        }
+        
+        .table thead {
+            display: none;
+        }
+        
+        .table tbody tr {
+            display: block;
+            margin-bottom: 1rem;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1rem;
+        }
+        
+        .table tbody td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border: none;
+        }
+        
+        .table tbody td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: #495057;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+        
+        .btn-group {
+            width: 100%;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- En-tête de page -->
+<div class="page-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="page-title mb-2">
+                    <i class="fas fa-boxes me-3"></i>Liste des Produits
+                </h1>
+                <p class="lead mb-0">Gérez l'ensemble des produits de votre inventaire</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="{% url 'produit' %}" class="btn btn-light btn-lg">
+                    <i class="fas fa-plus-circle me-2"></i>Ajouter un produit
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Cartes de statistiques -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="stats-card">
+                <div class="stats-number">{{total_produit}}</div>
+                <div class="stats-label">Produits Total</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stats-card">
+                <div class="stats-number">{{total_produit_faible}}</div>
+                <div class="stats-label">Stock Faible</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stats-card">
+                <div class="stats-number">{{total_categorie}}</div>
+                <div class="stats-label">Catégories</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stats-card">
+                <div class="stats-number">{{total_commercant}}</div>
+                <div class="stats-label">Commerçants</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtres et recherche -->
+    <div class="filters-card">
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-3 mb-md-0">
+                <div class="search-box">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="form-control" placeholder="Rechercher un produit..." id="searchInput">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-6 mb-2 mb-md-0">
+                        <select class="form-select" id="categoryFilter">
+                            <option value="">Toutes les catégories</option>
+                            {% for cat in categorie %}
+                            <option value="{{ cat.nom }}">{{ cat.nom }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <select class="form-select" id="stockFilter">
+                            <option value="">Tous les stocks</option>
+                            <option value="low">Stock faible</option>
+                            <option value="medium">Stock moyen</option>
+                            <option value="high">Stock élevé</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau des produits -->
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="table table-hover" id="productsTable">
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">Image</th>
+                        <th>Nom</th>
+                        <th>Prix</th>
+                        <th>Stock</th>
+                        <th>Catégorie</th>
+                        <th>Commerçant</th>
+                        <th style="width: 200px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in produits %}
+                    <tr data-category="{{ p.categorie.nom }}" data-stock="{{ p.quantite_en_stock }}">
+                        <td data-label="Image">
+                            {% if p.image %}
+                            <img src="{{ p.image.url }}" alt="{{ p.nom }}" class="product-image">
+                            {% else %}
+                            <div class="product-image bg-light d-flex align-items-center justify-content-center">
+                                <i class="fas fa-image text-muted"></i>
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td data-label="Nom">
+                            <strong>{{ p.nom }}</strong>
+                            {% if p.description %}
+                            <br><small class="text-muted">{{ p.description|truncatewords:5 }}</small>
+                            {% endif %}
+                        </td>
+                        <td data-label="Prix">
+                            <span class="price-tag">{{ p.prix }} FCFA</span>
+                        </td>
+                        <td data-label="Stock">
+                            <span class="stock-badge stock-{% if p.quantite_en_stock <= 10 %}low{% elif p.quantite_en_stock <= 50 %}medium{% else %}high{% endif %}">
+                                {{ p.quantite_en_stock }} unités
+                            </span>
+                        </td>
+                        <td data-label="Catégorie">
+                            <span class="badge bg-light text-dark">{{ p.categorie_id.nom }}</span>
+                        </td>
+                        <td data-label="Commerçant">
+                            {{ p.Commercant_id.utilisateur.nom }}
+                        </td>
+                        <td data-label="Actions">
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'form_modifier_produit' p.id %}" class="btn btn-warning btn-action" 
+                                   data-bs-toggle="tooltip" title="Modifier le produit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'supprimer_produit' p.id %}" class="btn btn-danger btn-action"
+                                   data-bs-toggle="tooltip" title="Supprimer le produit"
+                                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                                <a href="#" class="btn btn-info btn-action"
+                                   data-bs-toggle="tooltip" title="Voir les détails">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <h4>Aucun produit trouvé</h4>
+                                <p class="mb-3">Commencez par ajouter votre premier produit à l'inventaire</p>
+                                <a href="{% url 'produit' %}" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>Ajouter un produit
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if produits.has_other_pages %}
+        <div class="pagination-container">
+            <nav aria-label="Navigation des pages">
+                <ul class="pagination justify-content-center mb-0">
+                    {% if produits.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ produits.previous_page_number }}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for i in produits.paginator.page_range %}
+                    <li class="page-item {% if produits.number == i %}active{% endif %}">
+                        <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                    </li>
+                    {% endfor %}
+                    
+                    {% if produits.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ produits.next_page_number }}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialisation des tooltips Bootstrap
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Filtrage en temps réel
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const stockFilter = document.getElementById('stockFilter');
+    const tableRows = document.querySelectorAll('#productsTable tbody tr');
+    
+    function filterProducts() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedCategory = categoryFilter.value;
+        const selectedStock = stockFilter.value;
+        
+        tableRows.forEach(row => {
+            const productName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+            const category = row.getAttribute('data-category');
+            const stock = parseInt(row.getAttribute('data-stock'));
+            
+            let stockLevel = '';
+            if (stock <= 10) stockLevel = 'low';
+            else if (stock <= 50) stockLevel = 'medium';
+            else stockLevel = 'high';
+            
+            const nameMatch = productName.includes(searchTerm);
+            const categoryMatch = !selectedCategory || category === selectedCategory;
+            const stockMatch = !selectedStock || stockLevel === selectedStock;
+            
+            if (nameMatch && categoryMatch && stockMatch) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+    
+    searchInput.addEventListener('input', filterProducts);
+    categoryFilter.addEventListener('change', filterProducts);
+    stockFilter.addEventListener('change', filterProducts);
+    
+    // Confirmation de suppression
+    const deleteButtons = document.querySelectorAll('.btn-danger');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce produit ? Cette action est irréversible.')) {
+                e.preventDefault();
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,362 @@
+{% extends 'base_livreur.html' %}
+{% load static %}
+
+{% block title %}Tableau de Bord - Livreur{% endblock %}
+
+{% block page_title %}Tableau de Bord{% endblock %}
+
+{% block content %}
+<div class="dashboard-content">
+    <!-- Stats Overview -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon primary">
+                <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <div class="stat-value">€320</div>
+            <div class="stat-label">Revenus du jour</div>
+            <small class="text-success"><i class="fas fa-arrow-up"></i> €45 vs hier</small>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon success">
+                <i class="fas fa-shipping-fast"></i>
+            </div>
+            <div class="stat-value">28</div>
+            <div class="stat-label">Livraisons ce mois</div>
+            <small class="text-success">Objectif: 30/30</small>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon warning">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-value">18min</div>
+            <div class="stat-label">Temps moyen</div>
+            <small class="text-warning">-2min vs moyenne</small>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon info">
+                <i class="fas fa-star"></i>
+            </div>
+            <div class="stat-value">4.9</div>
+            <div class="stat-label">Note moyenne</div>
+            <small class="text-info">36 avis clients</small>
+        </div>
+    </div>
+
+    <!-- Current Delivery -->
+    <div class="current-delivery">
+        <div class="delivery-header">
+            <h3 class="delivery-title">Livraison en cours</h3>
+            <span class="delivery-urgency">
+                <i class="fas fa-clock me-1"></i>
+                Livraison urgente
+            </span>
+        </div>
+        <div class="delivery-content">
+            <div class="delivery-info">
+                <div class="info-item">
+                    <span class="info-label">Commande</span>
+                    <span class="info-value">#CMD-0015</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Client</span>
+                    <span class="info-value">Marie Dupont</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Téléphone</span>
+                    <span class="info-value">06 12 34 56 78</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Adresse</span>
+                    <span class="info-value">15 Rue de la Paix, 75002</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Montant</span>
+                    <span class="info-value">€85.50</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Échéance</span>
+                    <span class="info-value">14:30 (dans 25min)</span>
+                </div>
+            </div>
+
+            <!-- Delivery Progress -->
+            <div class="delivery-progress">
+                <div class="progress-steps">
+                    <div class="progress-bar" style="width: 66%;"></div>
+                    <div class="step completed">
+                        <div class="step-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <span class="step-label">Confirmée</span>
+                    </div>
+                    <div class="step completed">
+                        <div class="step-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <span class="step-label">Récupérée</span>
+                    </div>
+                    <div class="step active">
+                        <div class="step-icon">
+                            <i class="fas fa-motorcycle"></i>
+                        </div>
+                        <span class="step-label">En route</span>
+                    </div>
+                    <div class="step">
+                        <div class="step-icon">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <span class="step-label">Livrée</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delivery Actions -->
+            <div class="delivery-actions">
+                <button class="btn btn-primary">
+                    <i class="fas fa-phone me-1"></i>
+                    Appeler client
+                </button>
+                <button class="btn btn-outline-primary">
+                    <i class="fas fa-map-marked-alt me-1"></i>
+                    Itinéraire
+                </button>
+                <button class="btn btn-success">
+                    <i class="fas fa-check me-1"></i>
+                    Livrée
+                </button>
+                <button class="btn btn-outline-danger">
+                    <i class="fas fa-exclamation-triangle me-1"></i>
+                    Problème
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts & Next Deliveries -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <h3 class="chart-title">Performance hebdomadaire</h3>
+                    <canvas id="performanceChart" height="250"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 class="chart-title">Répartition revenus</h3>
+                    <canvas id="revenueChart" height="250"></canvas>
+                </div>
+            </div>
+
+            <!-- Next Deliveries -->
+            <div class="recent-deliveries mt-4">
+                <div class="table-header">
+                    <h3 class="table-title">Prochaines livraisons</h3>
+                    <a href="#" class="btn btn-outline-primary btn-sm">
+                        Voir tout <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Commande</th>
+                                <th>Adresse</th>
+                                <th>Heure</th>
+                                <th>Statut</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#CMD-0016</td>
+                                <td>8 Av. des Champs-Élysées</td>
+                                <td>15:15</td>
+                                <td><span class="delivery-status status-pending">En attente</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-play"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#CMD-0017</td>
+                                <td>22 Rue de Rivoli</td>
+                                <td>16:00</td>
+                                <td><span class="delivery-status status-pending">En attente</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-play"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#CMD-0018</td>
+                                <td>5 Bd Saint-Germain</td>
+                                <td>16:45</td>
+                                <td><span class="delivery-status status-picked">Récupérée</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary">
+                                        <i class="fas fa-road"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Today's Summary -->
+            <div class="chart-container h-100">
+                <h3 class="chart-title">Aujourd'hui</h3>
+                <div class="today-stats">
+                    <div class="d-flex justify-content-between align-items-center mb-3 p-3 border rounded">
+                        <div>
+                            <h6 class="mb-0">Livraisons effectuées</h6>
+                            <small class="text-muted">Sur 12 prévues</small>
+                        </div>
+                        <span class="stat-value text-success">8</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-3 p-3 border rounded">
+                        <div>
+                            <h6 class="mb-0">Revenus du jour</h6>
+                            <small class="text-muted">+ pourboires</small>
+                        </div>
+                        <span class="stat-value text-primary">€64.50</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-3 p-3 border rounded">
+                        <div>
+                            <h6 class="mb-0">Pourboires</h6>
+                            <small class="text-muted">Moyenne €2.50</small>
+                        </div>
+                        <span class="stat-value text-warning">€12.00</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center p-3 border rounded">
+                        <div>
+                            <h6 class="mb-0">Kilométrage</h6>
+                            <small class="text-muted">Distance totale</small>
+                        </div>
+                        <span class="stat-value text-info">28km</span>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="quick-actions mt-4">
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-map-marker-alt fa-2x"></i>
+                        <span>Zones actives</span>
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-chart-bar fa-2x"></i>
+                        <span>Mes revenus</span>
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-trophy fa-2x"></i>
+                        <span>Performance</span>
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-cog fa-2x"></i>
+                        <span>Paramètres</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Performance Chart
+    const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+    const performanceChart = new Chart(performanceCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+            datasets: [
+                {
+                    label: 'Livraisons',
+                    data: [12, 15, 14, 16, 18, 22, 20],
+                    backgroundColor: '#1e9b9b',
+                    borderColor: '#1e9b9b',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Objectif',
+                    data: [15, 15, 15, 15, 15, 20, 20],
+                    backgroundColor: 'rgba(30, 155, 155, 0.2)',
+                    borderColor: 'rgba(30, 155, 155, 0.5)',
+                    borderWidth: 1,
+                    type: 'line',
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        drawBorder: false
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    const revenueChart = new Chart(revenueCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Livraisons', 'Pourboires', 'Bonus', 'Prime'],
+            datasets: [{
+                data: [320, 85, 45, 30],
+                backgroundColor: [
+                    '#1e9b9b',
+                    '#4caf50',
+                    '#ff9800',
+                    '#2196f3'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+});
+</script>
+
+<style>
+.today-stats .stat-value {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+</style>
+{% endblock %}

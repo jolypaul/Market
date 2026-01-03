@@ -1,0 +1,262 @@
+{% extends layout %}
+
+{% block title %}Mes Commandes - Marché Virtuel{% endblock %}
+
+{% block content %}
+<div class="commandes-container">
+    <h1>Mes Commandes</h1>
+    
+    {% if messages %}
+        <div class="alert-container">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    {% if commandes %}
+        <div class="commandes-list">
+            {% for commande in commandes %}
+            <div class="commande-card">
+                <div class="commande-header">
+                    <div class="commande-info">
+                        <h3>Commande #{{ commande.id }}</h3>
+                        <p class="commande-date">{{ commande.date_commande|date:"d/m/Y H:i" }}</p>
+                    </div>
+                    <div class="commande-status">
+                        <span class="badge badge-{{ commande.statut }}">
+                            {{ commande.get_statut_display }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="commande-body">
+                    <div class="articles-preview">
+                        <h4>Articles ({{ commande.get_total_articles }})</h4>
+                        <ul class="items-list">
+                            {% for article in commande.articles.all|slice:":3" %}
+                            <li>
+                                {{ article.produit.nom }} 
+                                <span class="item-qty">({{ article.quantite }}x)</span>
+                            </li>
+                            {% endfor %}
+                            {% if commande.articles.count > 3 %}
+                            <li><em>+{{ commande.articles.count|add:"-3" }} autre(s)...</em></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    
+                    <div class="commande-details">
+                        <div class="detail-row">
+                            <span>Total</span>
+                            <strong>{{ commande.total }} €</strong>
+                        </div>
+                        <div class="detail-row">
+                            <span>Livraison</span>
+                            <span class="delivery-status">En cours de traitement</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="commande-footer">
+                    <a href="{% url 'detail_commande' commande.id %}" class="btn btn-sm btn-primary">
+                        Voir Détails
+                    </a>
+                    {% if commande.statut in "en_attente,confirmee" %}
+                    <a href="{% url 'annuler_commande' commande.id %}" class="btn btn-sm btn-outline-danger"
+                       onclick="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?')">
+                        Annuler
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-box">
+                <i class="icon-box"></i>
+                <h2>Aucune commande pour le moment</h2>
+                <p>Vous n'avez pas encore passé de commande.</p>
+                <a href="{% url 'tout_les_produits' %}" class="btn btn-primary">
+                    Découvrir nos produits
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .commandes-container {
+        max-width: 1000px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+    
+    .commandes-list {
+        display: grid;
+        gap: 1.5rem;
+    }
+    
+    .commande-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        overflow: hidden;
+        transition: all 0.3s;
+    }
+    
+    .commande-card:hover {
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    
+    .commande-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid #eee;
+        background: #f9f9f9;
+    }
+    
+    .commande-info h3 {
+        margin: 0 0 0.25rem 0;
+        font-size: 1.1rem;
+    }
+    
+    .commande-date {
+        margin: 0;
+        color: #999;
+        font-size: 0.9rem;
+    }
+    
+    .badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+    
+    .badge-en_attente {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .badge-confirmee {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+    
+    .badge-en_cours {
+        background: #cfe2ff;
+        color: #084298;
+    }
+    
+    .badge-preparee {
+        background: #e2e3e5;
+        color: #41464b;
+    }
+    
+    .badge-expediee {
+        background: #cff4fc;
+        color: #055160;
+    }
+    
+    .badge-livree {
+        background: #d1e7dd;
+        color: #0a3622;
+    }
+    
+    .badge-annulee {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .commande-body {
+        padding: 1.5rem;
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+    }
+    
+    .articles-preview h4 {
+        margin: 0 0 1rem 0;
+        font-size: 1rem;
+    }
+    
+    .items-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .items-list li {
+        padding: 0.5rem 0;
+        color: #666;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .items-list li:last-child {
+        border-bottom: none;
+    }
+    
+    .item-qty {
+        color: #999;
+        font-size: 0.9rem;
+    }
+    
+    .commande-details {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+    
+    .delivery-status {
+        color: #17a2b8;
+        font-weight: 500;
+    }
+    
+    .commande-footer {
+        padding: 1rem 1.5rem;
+        background: #f9f9f9;
+        border-top: 1px solid #eee;
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+    
+    .empty-box {
+        background: white;
+        padding: 3rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .empty-box .icon-box {
+        font-size: 3rem;
+        color: #ddd;
+        display: block;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-box h2 {
+        margin-top: 0;
+    }
+</style>
+{% endblock %}

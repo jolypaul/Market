@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vérification du code - Marché Virtuel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-color: #10b981;
+            --error-color: #ef4444;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--primary-gradient);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            padding: 20px;
+        }
+        
+        .verify-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 3rem 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+        
+        .verify-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: white;
+            font-size: 2rem;
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        h1 {
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+        }
+        
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+        
+        .code-inputs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        
+        .code-input {
+            width: 50px;
+            height: 60px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .code-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+            transform: scale(1.05);
+        }
+        
+        .code-input.filled {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+        
+        .timer {
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+        
+        .timer.expiring {
+            color: #ef4444;
+            font-weight: 600;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .resend-section {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 10px;
+        }
+        
+        .resend-btn {
+            background: none;
+            border: none;
+            color: #667eea;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        
+        .resend-btn:disabled {
+            color: #9ca3af;
+            cursor: not-allowed;
+            text-decoration: none;
+        }
+        
+        .back-link {
+            display: inline-block;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        .instructions {
+            text-align: left;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: #f0f9ff;
+            border-radius: 10px;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .instructions h3 {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: #1e40af;
+        }
+        
+        .instructions p {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="verify-container">
+        <div class="verify-icon">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+        
+        <h1>Vérification du code</h1>
+        <p class="subtitle">Entrez le code à 6 chiffres envoyé à votre adresse email</p>
+        
+        <div class="instructions">
+            <h3><i class="fas fa-info-circle me-2"></i>Comment utiliser le code</h3>
+            <p>• Vérifiez votre boîte email (pensez aux spams)<br>
+               • Le code est valable 10 minutes<br>
+               • Saisissez les chiffres dans l'ordre</p>
+        </div>
+        
+        <form method="POST" id="verifyForm">
+            {% csrf_token %}
+            
+            <div class="code-inputs" id="codeInputs">
+                <input type="text" class="code-input" maxlength="1" data-index="0" inputmode="numeric" pattern="[0-9]">
+                <input type="text" class="code-input" maxlength="1" data-index="1" inputmode="numeric" pattern="[0-9]">
+                <input type="text" class="code-input" maxlength="1" data-index="2" inputmode="numeric" pattern="[0-9]">
+                <input type="text" class="code-input" maxlength="1" data-index="3" inputmode="numeric" pattern="[0-9]">
+                <input type="text" class="code-input" maxlength="1" data-index="4" inputmode="numeric" pattern="[0-9]">
+                <input type="text" class="code-input" maxlength="1" data-index="5" inputmode="numeric" pattern="[0-9]">
+            </div>
+            
+            <input type="hidden" name="code" id="hiddenCode">
+            
+            <div class="timer" id="timer">
+                <i class="fas fa-clock me-2"></i>
+                <span id="timeLeft">10:00</span>
+            </div>
+            
+            <button type="submit" class="submit-btn" id="submitBtn" disabled>
+                <i class="fas fa-check-circle me-2"></i>Vérifier le code
+            </button>
+        </form>
+        
+        <div class="resend-section">
+            <p style="font-size: 0.9rem; color: #6b7280; margin-bottom: 0.5rem;">
+                Vous n'avez pas reçu le code ?
+            </p>
+            <button type="button" class="resend-btn" id="resendBtn">
+                <i class="fas fa-redo me-2"></i>Renvoyer le code
+            </button>
+            <span id="resendTimer" style="font-size: 0.8rem; color: #9ca3af; margin-left: 0.5rem;"></span>
+        </div>
+        
+        <a href="{% url 'login' %}" class="back-link">
+            <i class="fas fa-arrow-left me-2"></i>Retour à la connexion
+        </a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const codeInputs = document.querySelectorAll('.code-input');
+            const hiddenCode = document.getElementById('hiddenCode');
+            const submitBtn = document.getElementById('submitBtn');
+            const timer = document.getElementById('timer');
+            const timeLeft = document.getElementById('timeLeft');
+            const resendBtn = document.getElementById('resendBtn');
+            const resendTimer = document.getElementById('resendTimer');
+            
+            let timeRemaining = 10 * 60; // 10 minutes en secondes
+            let canResend = false;
+            
+            // Gérer la saisie du code
+            codeInputs.forEach((input, index) => {
+                input.addEventListener('input', function(e) {
+                    const value = e.target.value;
+                    
+                    // Vérifier que c'est un chiffre
+                    if (value && !/^\d$/.test(value)) {
+                        e.target.value = '';
+                        return;
+                    }
+                    
+                    // Aller à l'input suivant si un chiffre est saisi
+                    if (value && index < codeInputs.length - 1) {
+                        codeInputs[index + 1].focus();
+                    }
+                    
+                    // Mettre à jour le code caché et vérifier la complétion
+                    updateHiddenCode();
+                    checkCodeCompletion();
+                });
+                
+                input.addEventListener('keydown', function(e) {
+                    // Gérer la touche retour arrière
+                    if (e.key === 'Backspace') {
+                        if (!e.target.value && index > 0) {
+                            codeInputs[index - 1].focus();
+                        }
+                        updateHiddenCode();
+                        checkCodeCompletion();
+                    }
+                    
+                    // Gérer les flèches
+                    if (e.key === 'ArrowLeft' && index > 0) {
+                        codeInputs[index - 1].focus();
+                    }
+                    if (e.key === 'ArrowRight' && index < codeInputs.length - 1) {
+                        codeInputs[index + 1].focus();
+                    }
+                });
+                
+                input.addEventListener('paste', function(e) {
+                    e.preventDefault();
+                    const pasteData = e.clipboardData.getData('text');
+                    const numbers = pasteData.replace(/\D/g, '').split('').slice(0, 6);
+                    
+                    numbers.forEach((num, idx) => {
+                        if (codeInputs[idx]) {
+                            codeInputs[idx].value = num;
+                            codeInputs[idx].classList.add('filled');
+                        }
+                    });
+                    
+                    // Focus sur le dernier input rempli
+                    const lastFilledIndex = Math.min(numbers.length, codeInputs.length - 1);
+                    codeInputs[lastFilledIndex].focus();
+                    
+                    updateHiddenCode();
+                    checkCodeCompletion();
+                });
+            });
+            
+            function updateHiddenCode() {
+                const code = Array.from(codeInputs).map(input => input.value).join('');
+                hiddenCode.value = code;
+                
+                // Mettre à jour les styles des inputs
+                codeInputs.forEach(input => {
+                    if (input.value) {
+                        input.classList.add('filled');
+                    } else {
+                        input.classList.remove('filled');
+                    }
+                });
+            }
+            
+            function checkCodeCompletion() {
+                const code = hiddenCode.value;
+                const isComplete = code.length === 6;
+                submitBtn.disabled = !isComplete;
+            }
+            
+            // Timer principal
+            function updateTimer() {
+                const minutes = Math.floor(timeRemaining / 60);
+                const seconds = timeRemaining % 60;
+                
+                timeLeft.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (timeRemaining <= 60) {
+                    timer.classList.add('expiring');
+                }
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    timeLeft.textContent = 'Expiré';
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Code expiré';
+                    canResend = true;
+                    updateResendButton();
+                } else {
+                    timeRemaining--;
+                }
+            }
+            
+            let timerInterval = setInterval(updateTimer, 1000);
+            
+            // Gestion du renvoi
+            function updateResendButton() {
+                if (canResend) {
+                    resendBtn.disabled = false;
+                    resendTimer.textContent = '';
+                } else {
+                    resendBtn.disabled = true;
+                    resendTimer.textContent = '(Attendez 30 secondes)';
+                }
+            }
+            
+            resendBtn.addEventListener('click', function() {
+                if (!canResend) return;
+                
+                // Simuler l'envoi du code
+                alert('Un nouveau code a été envoyé à votre adresse email');
+                
+                // Réinitialiser le formulaire
+                codeInputs.forEach(input => {
+                    input.value = '';
+                    input.classList.remove('filled');
+                });
+                hiddenCode.value = '';
+                submitBtn.disabled = true;
+                
+                // Réinitialiser le timer
+                timeRemaining = 10 * 60;
+                timer.classList.remove('expiring');
+                clearInterval(timerInterval);
+                timerInterval = setInterval(updateTimer, 1000);
+                
+                // Désactiver le renvoi temporairement
+                canResend = false;
+                updateResendButton();
+                
+                setTimeout(() => {
+                    canResend = true;
+                    updateResendButton();
+                }, 30000); // 30 secondes
+            });
+            
+            // Initialiser
+            updateResendButton();
+        });
+    </script>
+</body>
+</html>

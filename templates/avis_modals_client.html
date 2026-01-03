@@ -1,0 +1,278 @@
+<!-- templates/avis/modals_client.html -->
+<!-- Modal Avis Produit (Création et Modification) -->
+<div class="modal fade" id="modalAvisProduit" tabindex="-1" aria-labelledby="modalAvisProduitLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="modalAvisProduitLabel">
+                    <i class="fas fa-star me-2"></i>
+                    <span id="modalAvisProduitTitle">Nouvel Avis Produit</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" id="formAvisProduit" action="{% url 'creer_avis' %}">
+                {% csrf_token %}
+                <input type="hidden" name="avis_id" id="avis_id">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Produit</label>
+                        <select name="produit" id="selectProduit" class="form-select" required>
+                            <option value="">Sélectionnez un produit</option>
+                            {% for produit in produits_achetes %}
+                            <option value="{{ produit.id }}">{{ produit.nom }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Note (0-5)</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="number" name="note" id="inputNote" class="form-control" min="0" max="5" required style="width: 80px;">
+                            <small class="text-muted">/ 5 étoiles</small>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Commentaire</label>
+                        <textarea name="commentaire" id="textareaCommentaire" class="form-control" rows="4" 
+                                  placeholder="Partagez votre expérience avec ce produit..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Annuler
+                    </button>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-paper-plane me-1"></i>
+                        <span id="modalAvisProduitSubmit">Publier l'avis</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Commentaire Commerçant (Création et Modification) -->
+<div class="modal fade" id="modalCommentaireCommercant" tabindex="-1" aria-labelledby="modalCommentaireCommercantLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="modalCommentaireCommercantLabel">
+                    <i class="fas fa-store me-2"></i>
+                    <span id="modalCommentaireCommercantTitle">Nouveau Commentaire Commerçant</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" id="formCommentaireCommercant" action="{% url 'creer_commentaire_commercant' %}">
+                {% csrf_token %}
+                <input type="hidden" name="commentaire_id" id="commentaire_id">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Commerçant</label>
+                        <select name="commercant" id="selectCommercantCommentaire" class="form-select" required>
+                            <option value="">Sélectionnez un commerçant</option>
+                            {% for commercant in commerçants_connus %}
+                            <option value="{{ commercant.id }}">{{ commercant.utilisateur.nom }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Commentaire</label>
+                        <textarea name="commentaire" id="textareaCommentaireCommercant" class="form-control" rows="4" 
+                                  placeholder="Laissez un commentaire sur ce commerçant..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Annuler
+                    </button>
+                    <button type="submit" class="btn btn-info text-white">
+                        <i class="fas fa-share me-1"></i>
+                        <span id="modalCommentaireCommercantSubmit">Publier le commentaire</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Avis Commerçant (Création et Modification) -->
+<div class="modal fade" id="modalAvisCommercant" tabindex="-1" aria-labelledby="modalAvisCommercantLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalAvisCommercantLabel">
+                    <i class="fas fa-chart-star me-2"></i>
+                    <span id="modalAvisCommercantTitle">Nouvel Avis Commerçant</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" id="formAvisCommercant" action="{% url 'creer_avis_commercant' %}">
+                {% csrf_token %}
+                <input type="hidden" name="avis_commercant_id" id="avis_commercant_id">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Commerçant</label>
+                        <select name="commercant" id="selectCommercantAvis" class="form-select" required>
+                            <option value="">Sélectionnez un commerçant</option>
+                            {% for commercant in commerçants_connus %}
+                            <option value="{{ commercant.id }}">{{ commercant.utilisateur.nom }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Note (0-5)</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="number" name="note" id="inputNoteCommercant" class="form-control" min="0" max="5" required style="width: 80px;">
+                            <small class="text-muted">/ 5 étoiles</small>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Commentaire (optionnel)</label>
+                        <textarea name="commentaire" id="textareaCommentaireAvisCommercant" class="form-control" rows="3" 
+                                  placeholder="Commentaire optionnel..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Annuler
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check me-1"></i>
+                        <span id="modalAvisCommercantSubmit">Publier l'avis</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gestion des modals pour Avis Produit
+    const modalAvisProduit = document.getElementById('modalAvisProduit');
+    if (modalAvisProduit) {
+        modalAvisProduit.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            
+            if (button && button.getAttribute('data-avis-id')) {
+                // Mode modification
+                const avisId = button.getAttribute('data-avis-id');
+                const produitId = button.getAttribute('data-produit-id');
+                const note = button.getAttribute('data-note');
+                const commentaire = button.getAttribute('data-commentaire');
+                
+                // Mettre à jour le formulaire
+                document.getElementById('avis_id').value = avisId;
+                document.getElementById('selectProduit').value = produitId;
+                document.getElementById('inputNote').value = note;
+                document.getElementById('textareaCommentaire').value = commentaire;
+                
+                // Changer le titre et l'action
+                document.getElementById('modalAvisProduitTitle').textContent = 'Modifier l\'Avis Produit';
+                document.getElementById('modalAvisProduitSubmit').textContent = 'Modifier l\'avis';
+                document.getElementById('formAvisProduit').action = "{% url 'modifier_avis' 0 %}".replace('0', avisId);
+            } else {
+                // Mode création - réinitialiser le formulaire
+                resetAvisProduitForm();
+            }
+        });
+    }
+
+    // Gestion des modals pour Commentaire Commerçant
+    const modalCommentaireCommercant = document.getElementById('modalCommentaireCommercant');
+    if (modalCommentaireCommercant) {
+        modalCommentaireCommercant.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            
+            if (button && button.getAttribute('data-commentaire-id')) {
+                // Mode modification
+                const commentaireId = button.getAttribute('data-commentaire-id');
+                const commercantId = button.getAttribute('data-commercant-id');
+                const commentaire = button.getAttribute('data-commentaire');
+                
+                // Mettre à jour le formulaire
+                document.getElementById('commentaire_id').value = commentaireId;
+                document.getElementById('selectCommercantCommentaire').value = commercantId;
+                document.getElementById('textareaCommentaireCommercant').value = commentaire;
+                
+                // Changer le titre et l'action
+                document.getElementById('modalCommentaireCommercantTitle').textContent = 'Modifier le Commentaire';
+                document.getElementById('modalCommentaireCommercantSubmit').textContent = 'Modifier le commentaire';
+                document.getElementById('formCommentaireCommercant').action = "{% url 'modifier_commentaire_commercant' 0 %}".replace('0', commentaireId);
+            } else {
+                // Mode création - réinitialiser le formulaire
+                resetCommentaireCommercantForm();
+            }
+        });
+    }
+
+    // Gestion des modals pour Avis Commerçant
+    const modalAvisCommercant = document.getElementById('modalAvisCommercant');
+    if (modalAvisCommercant) {
+        modalAvisCommercant.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            
+            if (button && button.getAttribute('data-avis-commercant-id')) {
+                // Mode modification
+                const avisCommercantId = button.getAttribute('data-avis-commercant-id');
+                const commercantId = button.getAttribute('data-commercant-id');
+                const note = button.getAttribute('data-note');
+                const commentaire = button.getAttribute('data-commentaire');
+                
+                // Mettre à jour le formulaire
+                document.getElementById('avis_commercant_id').value = avisCommercantId;
+                document.getElementById('selectCommercantAvis').value = commercantId;
+                document.getElementById('inputNoteCommercant').value = note;
+                document.getElementById('textareaCommentaireAvisCommercant').value = commentaire || '';
+                
+                // Changer le titre et l'action
+                document.getElementById('modalAvisCommercantTitle').textContent = 'Modifier l\'Avis Commerçant';
+                document.getElementById('modalAvisCommercantSubmit').textContent = 'Modifier l\'avis';
+                document.getElementById('formAvisCommercant').action = "{% url 'modifier_avis_commercant' 0 %}".replace('0', avisCommercantId);
+            } else {
+                // Mode création - réinitialiser le formulaire
+                resetAvisCommercantForm();
+            }
+        });
+    }
+
+    // Fonctions de réinitialisation des formulaires
+    function resetAvisProduitForm() {
+        document.getElementById('avis_id').value = '';
+        document.getElementById('selectProduit').selectedIndex = 0;
+        document.getElementById('inputNote').value = '';
+        document.getElementById('textareaCommentaire').value = '';
+        document.getElementById('modalAvisProduitTitle').textContent = 'Nouvel Avis Produit';
+        document.getElementById('modalAvisProduitSubmit').textContent = 'Publier l\'avis';
+        document.getElementById('formAvisProduit').action = "{% url 'creer_avis' %}";
+    }
+
+    function resetCommentaireCommercantForm() {
+        document.getElementById('commentaire_id').value = '';
+        document.getElementById('selectCommercantCommentaire').selectedIndex = 0;
+        document.getElementById('textareaCommentaireCommercant').value = '';
+        document.getElementById('modalCommentaireCommercantTitle').textContent = 'Nouveau Commentaire Commerçant';
+        document.getElementById('modalCommentaireCommercantSubmit').textContent = 'Publier le commentaire';
+        document.getElementById('formCommentaireCommercant').action = "{% url 'creer_commentaire_commercant' %}";
+    }
+
+    function resetAvisCommercantForm() {
+        document.getElementById('avis_commercant_id').value = '';
+        document.getElementById('selectCommercantAvis').selectedIndex = 0;
+        document.getElementById('inputNoteCommercant').value = '';
+        document.getElementById('textareaCommentaireAvisCommercant').value = '';
+        document.getElementById('modalAvisCommercantTitle').textContent = 'Nouvel Avis Commerçant';
+        document.getElementById('modalAvisCommercantSubmit').textContent = 'Publier l\'avis';
+        document.getElementById('formAvisCommercant').action = "{% url 'creer_avis_commercant' %}";
+    }
+
+    // Réinitialiser les formulaires quand les modals se ferment
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        modal.addEventListener('hidden.bs.modal', function() {
+            resetAvisProduitForm();
+            resetCommentaireCommercantForm();
+            resetAvisCommercantForm();
+        });
+    });
+});
+</script>

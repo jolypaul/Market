@@ -1,0 +1,637 @@
+{% extends 'base_commercant.html' %}
+{% load static %}
+{% block title %}Modifier Produit - {{ produit.nom }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-lg border-0 custom-card">
+                <div class="card-header custom-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <div class="header-icon">
+                                <i class="bi bi-pencil-square"></i>
+                            </div>
+                            <div>
+                                <h4 class="mb-0 fw-bold">Modifier le produit</h4>
+                                <p class="mb-0 text-light opacity-75">{{ produit.nom }}</p>
+                            </div>
+                        </div>
+                        <a href="{% url 'page_produits' %}" class="btn btn-light btn-sm rounded-pill">
+                            <i class="bi bi-arrow-left me-1"></i> Retour aux produits
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body custom-body">
+                    <form method="POST" enctype="multipart/form-data" action="{% url 'modifierProduit' produit.id %}" class="needs-validation" novalidate>
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <!-- Colonne gauche - Informations de base -->
+                            <div class="col-md-6">
+                                <div class="section-wrapper">
+                                    <div class="section-header">
+                                        <i class="bi bi-info-circle-fill me-2"></i>
+                                        <h5>Informations de base</h5>
+                                    </div>
+                                    
+                                    <!-- Nom du produit -->
+                                    <div class="form-group custom-form-group">
+                                        <label for="nom" class="form-label">
+                                            <i class="bi bi-tag me-1"></i>Nom du produit
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group custom-input-group">
+                                            <input type="text" 
+                                                   class="form-control custom-input" 
+                                                   id="nom" 
+                                                   name="nom" 
+                                                   value="{{ produit.nom }}" 
+                                                   required
+                                                   placeholder="Ex: iPhone 13 Pro Max">
+                                        </div>
+                                        <div class="form-hint">
+                                            <i class="bi bi-lightbulb me-1"></i>
+                                            Choisissez un nom clair et descriptif
+                                        </div>
+                                    </div>
+
+                                    <!-- Description -->
+                                    <div class="form-group custom-form-group">
+                                        <label for="description" class="form-label">
+                                            <i class="bi bi-text-paragraph me-1"></i>Description
+                                        </label>
+                                        <div class="input-group custom-input-group">
+                                            <textarea class="form-control custom-textarea" 
+                                                      id="description" 
+                                                      name="description" 
+                                                      rows="4"
+                                                      placeholder="Décrivez les caractéristiques, avantages et spécifications de votre produit...">{{ produit.description }}</textarea>
+                                        </div>
+                                        <div class="form-hint">
+                                            <i class="bi bi-info-circle me-1"></i>
+                                            Cette description aide les clients à mieux comprendre votre produit
+                                        </div>
+                                    </div>
+
+                                    <!-- Catégorie -->
+                                    <div class="form-group custom-form-group">
+                                        <label for="categorie_id" class="form-label">
+                                            <i class="bi bi-grid-3x3 me-1"></i>Catégorie
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group custom-input-group">
+                                            <select class="form-select custom-select" id="categorie_id" name="categorie_id" required>
+                                                <option value="">Sélectionnez une catégorie</option>
+                                                {% for cat in categories %}
+                                                <option value="{{ cat.id }}" 
+                                                    {% if cat.id == produit.categorie_id_id %}selected{% endif %}>
+                                                    {{ cat.nom }}
+                                                </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Colonne droite - Prix et Stock -->
+                            <div class="col-md-6">
+                                <div class="section-wrapper">
+                                    <div class="section-header">
+                                        <i class="bi bi-currency-dollar me-2"></i>
+                                        <h5>Prix et Stock</h5>
+                                    </div>
+
+                                    <!-- Prix -->
+                                    <div class="form-group custom-form-group">
+                                        <label for="prix" class="form-label">
+                                            <i class="bi bi-cash-coin me-1"></i>Prix (FCFA)
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group custom-input-group">
+                                            <span class="input-group-text custom-input-prepend">
+                                                FCFA
+                                            </span>
+                                            <input type="number" 
+                                                   class="form-control custom-input" 
+                                                   id="prix" 
+                                                   name="prix" 
+                                                   value="{{ produit.prix }}" 
+                                                   min="0" 
+                                                   step="0.01"
+                                                   required
+                                                   placeholder="0.00">
+                                        </div>
+                                        <div class="form-hint">
+                                            <i class="bi bi-graph-up me-1"></i>
+                                            Prix de vente conseillé pour maximiser vos profits
+                                        </div>
+                                    </div>
+
+                                    <!-- Stock -->
+                                    <div class="form-group custom-form-group">
+                                        <label for="quantite_en_stock" class="form-label">
+                                            <i class="bi bi-box-seam me-1"></i>Quantité en stock
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group custom-input-group">
+                                            <input type="number" 
+                                                   class="form-control custom-input" 
+                                                   id="quantite_en_stock" 
+                                                   name="quantite_en_stock" 
+                                                   value="{{ produit.quantite_en_stock }}" 
+                                                   min="0"
+                                                   required
+                                                   placeholder="0">
+                                        </div>
+                                        <div class="form-hint">
+                                            <i class="bi bi-shield-check me-1"></i>
+                                            Mettez à jour régulièrement votre stock
+                                        </div>
+                                    </div>
+
+                                    <!-- Commerçant (lecture seule) -->
+                                    <div class="form-group custom-form-group">
+                                        <label for="Commercant_id" class="form-label">
+                                            <i class="bi bi-shop me-1"></i>Commerçant
+                                        </label>
+                                        <div class="input-group custom-input-group">
+                                            <select class="form-select custom-select" id="Commercant_id" name="Commercant_id" disabled>
+                                                <option value="{{ produit.Commercant_id_id }}">
+                                                    {{ produit.Commercant_id.utilisateur.nom }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="form-hint text-warning">
+                                            <i class="bi bi-lock me-1"></i>
+                                            Cette information ne peut pas être modifiée
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section Image -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="section-wrapper">
+                                    <div class="section-header">
+                                        <i class="bi bi-image-fill me-2"></i>
+                                        <h5>Image du produit</h5>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <!-- Image actuelle -->
+                                        <div class="col-md-6">
+                                            <div class="image-card current-image">
+                                                <div class="image-card-header">
+                                                    <i class="bi bi-check-circle-fill me-2"></i>
+                                                    Image actuelle
+                                                </div>
+                                                <div class="image-card-body">
+                                                    {% if produit.image %}
+                                                        <div class="image-preview">
+                                                            <img src="{{ produit.image.url }}" 
+                                                                 class="img-fluid" 
+                                                                 alt="{{ produit.nom }}">
+                                                            <div class="image-overlay">
+                                                                <span class="badge bg-success">Actuelle</span>
+                                                            </div>
+                                                        </div>
+                                                    {% else %}
+                                                        <div class="no-image">
+                                                            <i class="bi bi-image text-muted"></i>
+                                                            <p class="text-muted mt-2">Aucune image définie</p>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Nouvelle image -->
+                                        <div class="col-md-6">
+                                            <div class="image-card new-image">
+                                                <div class="image-card-header">
+                                                    <i class="bi bi-arrow-up-circle me-2"></i>
+                                                    Nouvelle image
+                                                </div>
+                                                <div class="image-card-body">
+                                                    <div class="upload-area" id="uploadArea">
+                                                        <i class="bi bi-cloud-upload"></i>
+                                                        <p class="mb-2">Glissez-déposez ou cliquez pour uploader</p>
+                                                        <small class="text-muted">JPG, PNG, GIF - Max 5MB</small>
+                                                        <input type="file" 
+                                                               class="form-control custom-file-input" 
+                                                               id="image" 
+                                                               name="image"
+                                                               accept="image/*"
+                                                               hidden>
+                                                    </div>
+                                                    <div class="upload-info">
+                                                        <i class="bi bi-info-circle me-1"></i>
+                                                        Une image de qualité améliore les ventes
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Boutons d'action -->
+                        <div class="action-buttons">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a href="{% url 'page_produits' %}" class="btn btn-outline-secondary btn-custom">
+                                    <i class="bi bi-x-circle me-2"></i> Annuler
+                                </a>
+                                <div class="d-flex gap-3">
+                                    <a href="{% url 'supprimer_produit' produit.id %}" 
+                                       class="btn btn-outline-danger btn-custom"
+                                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer définitivement ce produit ? Cette action est irréversible.')">
+                                        <i class="bi bi-trash me-2"></i> Supprimer
+                                    </a>
+                                    <button type="submit" class="btn btn-success btn-custom btn-save">
+                                        <i class="bi bi-check-lg me-2"></i> Enregistrer les modifications
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Style CSS amélioré -->
+<style>
+    :root {
+        --primary-color: #667eea;
+        --secondary-color: #764ba2;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --light-bg: #f8fafc;
+        --border-radius: 12px;
+        --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .custom-card {
+        border-radius: 20px;
+        border: none;
+        overflow: hidden;
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    }
+
+    .custom-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        border-bottom: none;
+        padding: 2rem;
+    }
+
+    .header-icon {
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 1.5rem;
+    }
+
+    .custom-body {
+        padding: 2.5rem;
+    }
+
+    .section-wrapper {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid #e9ecef;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        transition: var(--transition);
+    }
+
+    .section-wrapper:hover {
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--light-bg);
+    }
+
+    .section-header i {
+        color: var(--primary-color);
+        font-size: 1.2rem;
+    }
+
+    .section-header h5 {
+        color: #1f2937;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .custom-form-group {
+        margin-bottom: 2rem;
+    }
+
+    .form-label {
+        color: #374151;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .form-label i {
+        margin-right: 0.5rem;
+        color: var(--primary-color);
+    }
+
+    .custom-input-group {
+        position: relative;
+    }
+
+    .custom-input, .custom-select, .custom-textarea {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        transition: var(--transition);
+        background: white;
+    }
+
+    .custom-input:focus, .custom-select:focus, .custom-textarea:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .custom-input-prepend {
+        background: var(--light-bg);
+        border: 2px solid #e9ecef;
+        border-right: none;
+        border-radius: 10px 0 0 10px;
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+
+    .form-hint {
+        font-size: 0.85rem;
+        color: #6b7280;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .form-hint i {
+        margin-right: 0.5rem;
+    }
+
+    .image-card {
+        background: white;
+        border-radius: var(--border-radius);
+        border: 2px dashed #e9ecef;
+        transition: var(--transition);
+        height: 100%;
+    }
+
+    .image-card:hover {
+        border-color: var(--primary-color);
+        transform: translateY(-2px);
+    }
+
+    .image-card-header {
+        background: var(--light-bg);
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e9ecef;
+        font-weight: 600;
+        color: #374151;
+        display: flex;
+        align-items: center;
+    }
+
+    .image-card-body {
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .image-preview {
+        position: relative;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .image-preview img {
+        border-radius: 10px;
+        max-height: 200px;
+        object-fit: cover;
+        width: 100%;
+    }
+
+    .image-overlay {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+
+    .no-image {
+        color: #9ca3af;
+        padding: 2rem;
+    }
+
+    .no-image i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .upload-area {
+        border: 2px dashed #d1d5db;
+        border-radius: 10px;
+        padding: 2rem;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .upload-area:hover {
+        border-color: var(--primary-color);
+        background: var(--light-bg);
+    }
+
+    .upload-area i {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .upload-info {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: #fffbeb;
+        border-radius: 8px;
+        border-left: 4px solid var(--warning-color);
+    }
+
+    .action-buttons {
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 2px solid var(--light-bg);
+    }
+
+    .btn-custom {
+        border-radius: 10px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: var(--transition);
+        border: 2px solid;
+    }
+
+    .btn-save {
+        background: linear-gradient(135deg, var(--success-color), #059669);
+        border: none;
+        color: white;
+        padding: 0.75rem 2rem;
+    }
+
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-outline-danger:hover {
+        background: var(--danger-color);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .btn-outline-secondary:hover {
+        background: #6b7280;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .custom-body {
+            padding: 1.5rem;
+        }
+        
+        .section-wrapper {
+            padding: 1.5rem;
+        }
+        
+        .action-buttons .d-flex {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .action-buttons .d-flex > * {
+            width: 100%;
+        }
+    }
+</style>
+
+<!-- Script amélioré -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Validation du formulaire
+        const forms = document.querySelectorAll('.needs-validation');
+        
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    
+                    // Ajouter l'animation de shake sur les champs invalides
+                    const invalidFields = form.querySelectorAll(':invalid');
+                    invalidFields.forEach(field => {
+                        field.style.animation = 'shake 0.5s ease-in-out';
+                        setTimeout(() => field.style.animation = '', 500);
+                    });
+                }
+                
+                form.classList.add('was-validated');
+            }, false);
+        });
+
+        // Upload d'image avec aperçu
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('image');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#667eea';
+            uploadArea.style.background = '#f0f4ff';
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = '#d1d5db';
+            uploadArea.style.background = '';
+        });
+
+        fileInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Le fichier est trop volumineux. Taille maximum: 5MB');
+                    this.value = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadArea.innerHTML = `
+                        <img src="${e.target.result}" class="img-fluid rounded" style="max-height: 150px;">
+                        <p class="mt-2 text-success">${file.name}</p>
+                        <small class="text-muted">Cliquez pour changer</small>
+                    `;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Animation shake
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                75% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Validation en temps réel
+        const prixInput = document.getElementById('prix');
+        const stockInput = document.getElementById('quantite_en_stock');
+
+        [prixInput, stockInput].forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.value < 0) {
+                    this.setCustomValidity('La valeur ne peut pas être négative');
+                    this.classList.add('is-invalid');
+                } else {
+                    this.setCustomValidity('');
+                    this.classList.remove('is-invalid');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

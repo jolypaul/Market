@@ -1,0 +1,342 @@
+{% extends layout %}
+
+{% block title %}Paiement - Marché Virtuel{% endblock %}
+
+{% block content %}
+<div class="payment-container">
+    <div class="payment-content">
+        <h1>Finaliser votre Paiement</h1>
+        
+        <div class="payment-grid">
+            <!-- Résumé -->
+            <div class="payment-summary">
+                <h2>Résumé</h2>
+                <div class="summary-box">
+                    <div class="summary-row">
+                        <span>Commande #{{ commande.id }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Montant</span>
+                        <strong>{{ paiement.montant }} {{ paiement.devise|upper }}</strong>
+                    </div>
+                    <div class="summary-row">
+                        <span>Statut</span>
+                        <span class="badge badge-{{ paiement.statut }}">{{ paiement.get_statut_display }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Formulaire de paiement Stripe -->
+            <div class="payment-form">
+                <form id="payment-form">
+                    {% csrf_token %}
+                    
+                    <div id="card-element" class="stripe-element"></div>
+                    <div id="card-errors" class="error-message"></div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" 
+                               value="{{ client.utilisateur.email }}" 
+                               class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="name">Nom Complet</label>
+                        <input type="text" id="name" name="name" 
+                               value="{{ client.utilisateur.nom }}" 
+                               class="form-control" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">
+                        <span id="button-text">Payer {{ paiement.montant }} €</span>
+                        <div id="spinner" class="spinner hidden"></div>
+                    </button>
+                </form>
+                
+                <p class="security-text">
+                    <i class="icon-lock"></i> Paiement sécurisé par Stripe
+                </p>
+            </div>
+        </div>
+        
+        <!-- Message d'erreur globale -->
+        {% if messages %}
+            <div class="alert-container">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .payment-container {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+    
+    .payment-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+    
+    @media (max-width: 768px) {
+        .payment-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .payment-summary,
+    .payment-form {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .summary-box {
+        border-top: 2px solid #eee;
+        padding-top: 1rem;
+    }
+    
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .summary-row:last-child {
+        border-bottom: none;
+    }
+    
+    .badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .badge-en_cours {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .badge-confirme {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+    
+    .badge-effectue {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .badge-echec {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    /* Styles Stripe Elements */
+    .stripe-element {
+        padding: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+        background: #f9f9f9;
+    }
+    
+    .stripe-element.StripeElement--focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+    
+    .error-message {
+        color: #dc3545;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+        font-family: inherit;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+    
+    .btn-block {
+        width: 100%;
+    }
+    
+    #button-text {
+        display: inline-block;
+    }
+    
+    .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+        margin-left: 0.5rem;
+    }
+    
+    .spinner.hidden {
+        display: none;
+    }
+    
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+    
+    .security-text {
+        text-align: center;
+        margin-top: 1rem;
+        color: #999;
+        font-size: 0.9rem;
+    }
+    
+    .security-text i {
+        margin-right: 0.25rem;
+    }
+    
+    .alert-container {
+        margin-top: 2rem;
+    }
+    
+    .alert {
+        padding: 1rem;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+    }
+    
+    .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .alert-error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+</style>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    const stripe = Stripe('{{ stripe_public_key }}');
+    const elements = stripe.elements();
+    const cardElement = elements.create('card');
+    
+    cardElement.mount('#card-element');
+    
+    // Gestion des erreurs de carte
+    cardElement.on('change', function(event) {
+        const displayError = document.getElementById('card-errors');
+        if (event.error) {
+            displayError.textContent = event.error.message;
+        } else {
+            displayError.textContent = '';
+        }
+    });
+    
+    // Traitement du formulaire
+    const form = document.getElementById('payment-form');
+    form.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        const button = form.querySelector('button');
+        const spinner = document.getElementById('spinner');
+        const buttonText = document.getElementById('button-text');
+        
+        button.disabled = true;
+        buttonText.textContent = 'Traitement...';
+        spinner.classList.remove('hidden');
+        
+        const {error, paymentMethod} = await stripe.createPaymentMethod({
+            type: 'card',
+            card: cardElement,
+            billing_details: {
+                email: document.getElementById('email').value,
+                name: document.getElementById('name').value
+            }
+        });
+        
+        if (error) {
+            document.getElementById('card-errors').textContent = error.message;
+            button.disabled = false;
+            buttonText.textContent = 'Payer {{ paiement.montant }} €';
+            spinner.classList.add('hidden');
+        } else {
+            // Envoyer le paymentMethod au serveur
+            const formData = new FormData();
+            formData.append('payment_method_id', paymentMethod.id);
+            
+            try {
+                const response = await fetch('{% url "confirmer_paiement" paiement.id %}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    if (data.status === 'succeeded') {
+                        window.location.href = '{% url "paiement_succes" %}?paiement_id={{ paiement.id }}';
+                    } else if (data.status === 'requires_payment_method') {
+                        // Rediriger vers la page de succès
+                        window.location.href = '{% url "paiement_succes" %}?paiement_id={{ paiement.id }}';
+                    } else {
+                        document.getElementById('card-errors').textContent = 'Erreur de paiement. Veuillez réessayer.';
+                        button.disabled = false;
+                        buttonText.textContent = 'Payer {{ paiement.montant }} €';
+                        spinner.classList.add('hidden');
+                    }
+                } else {
+                    document.getElementById('card-errors').textContent = data.message || 'Erreur de paiement';
+                    button.disabled = false;
+                    buttonText.textContent = 'Payer {{ paiement.montant }} €';
+                    spinner.classList.add('hidden');
+                }
+            } catch (err) {
+                document.getElementById('card-errors').textContent = 'Erreur réseau. Veuillez réessayer.';
+                button.disabled = false;
+                buttonText.textContent = 'Payer {{ paiement.montant }} €';
+                spinner.classList.add('hidden');
+            }
+        }
+    });
+</script>
+{% endblock %}

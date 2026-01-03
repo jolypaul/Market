@@ -1,0 +1,217 @@
+<!-- templates/avis/dashboard_commercant.html -->
+{% extends 'base_commercant.html' %}
+{% load static %}
+
+{% block title %}Espace Gestion des Avis{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- En-tête avec statistiques -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-gradient-dark text-white shadow-lg">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h1 class="h2 mb-2">
+                                <i class="fas fa-store-alt me-2"></i>
+                                Gestion des Avis
+                            </h1>
+                            <p class="mb-0">Consultez et répondez aux retours de vos clients</p>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <div class="bg-white bg-opacity-25 rounded p-2">
+                                        <h3 class="mb-0">{{ moyenne_notes|default:"0.0" }}</h3>
+                                        <small>Note moyenne</small>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="bg-white bg-opacity-25 rounded p-2">
+                                        <h3 class="mb-0">{{ total_avis }}</h3>
+                                        <small>Avis reçus</small>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="bg-white bg-opacity-25 rounded p-2">
+                                        <h3 class="mb-0">{{ commentaires_attente }}</h3>
+                                        <small>À répondre</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Colonne Avis Commerçants -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-star me-2"></i>
+                        Avis sur ma Boutique
+                        <span class="badge bg-dark ms-2">{{ avis_commercant.count }}</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if avis_commercant %}
+                    <div class="list-group list-group-flush">
+                        {% for avis in avis_commercant %}
+                        <div class="list-group-item border-0 px-0">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6 class="mb-1">{{ avis.client.utilisateur.get_full_name }}</h6>
+                                    <div class="mb-2">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= avis.note %}
+                                                <i class="fas fa-star text-warning small"></i>
+                                            {% else %}
+                                                <i class="far fa-star text-warning small"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <small class="text-muted ms-2">{{ avis.note }}/5</small>
+                                    </div>
+                                </div>
+                                <small class="text-muted">{{ avis.date_creation|date:"d/m/Y" }}</small>
+                            </div>
+                            {% if avis.commentaire %}
+                            <p class="mb-2 text-dark">{{ avis.commentaire }}</p>
+                            {% endif %}
+                        </div>
+                        {% if not forloop.last %}<hr>{% endif %}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-star fa-2x text-muted mb-2"></i>
+                        <p class="text-muted">Aucun avis pour le moment</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Colonne Commentaires à répondre -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-comments me-2"></i>
+                        Commentaires à Répondre
+                        <span class="badge bg-warning ms-2">{{ commentaires_non_repondu.count }}</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if commentaires_non_repondu %}
+                    <div class="list-group list-group-flush">
+                        {% for commentaire in commentaires_non_repondu %}
+                        <div class="list-group-item border-0 px-0">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="mb-1">{{ commentaire.client.utilisateur.get_full_name }}</h6>
+                                <small class="text-muted">{{ commentaire.date_creation|date:"d/m/Y" }}</small>
+                            </div>
+                            <p class="mb-3 text-dark">{{ commentaire.commentaire|truncatewords:15 }}</p>
+                            <button type="button" class="btn btn-sm btn-outline-success" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#modalReponseCommentaire"
+                                    data-commentaire-id="{{ commentaire.id }}"
+                                    data-commentaire-text="{{ commentaire.commentaire }}">
+                                <i class="fas fa-reply me-1"></i>Répondre
+                            </button>
+                        </div>
+                        {% if not forloop.last %}<hr>{% endif %}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                        <p class="text-muted">Tous les commentaires ont été traités</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Commentaires avec réponses -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exchange-alt me-2"></i>
+                        Historique des Commentaires & Réponses
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if commentaires_avec_reponses %}
+                    <div class="row">
+                        {% for commentaire in commentaires_avec_reponses %}
+                        <div class="col-lg-6 mb-4">
+                            <div class="card border-success">
+                                <!-- Commentaire client -->
+                                <div class="card-header bg-light">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <strong>{{ commentaire.client.utilisateur.get_full_name }}</strong>
+                                        <small class="text-muted">{{ commentaire.date_creation|date:"d/m/Y H:i" }}</small>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <p class="mb-3">{{ commentaire.commentaire }}</p>
+                                    
+                                    <!-- Réponses -->
+                                    {% for reponse in commentaire.reponses.all %}
+                                    <div class="border-start border-3 border-success ps-3 ms-2">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <strong class="text-success">Votre réponse</strong>
+                                            <small class="text-muted">{{ reponse.date_creation|date:"d/m/Y H:i" }}</small>
+                                        </div>
+                                        <p class="mb-2">{{ reponse.reponse }}</p>
+                                        <div class="btn-group">
+                                            <a href="{% url 'modifier_reponse_commercant' reponse.id %}" 
+                                               class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'supprimer_reponse_commercant' reponse.id %}" 
+                                               class="btn btn-outline-danger btn-sm">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    {% if commentaire.reponses.count == 0 %}
+                                    <button type="button" class="btn btn-sm btn-success"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#modalReponseCommentaire"
+                                            data-commentaire-id="{{ commentaire.id }}"
+                                            data-commentaire-text="{{ commentaire.commentaire }}">
+                                        <i class="fas fa-reply me-1"></i>Répondre
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-comments fa-2x text-muted mb-2"></i>
+                        <p class="text-muted">Aucun commentaire avec réponse pour le moment</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals pour le commerçant -->
+{% include 'avis_modals_commercant.html' %}
+{% endblock %}

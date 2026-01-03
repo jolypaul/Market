@@ -1,0 +1,289 @@
+{% extends 'base_client.html' %}
+{% load static %}
+
+{% block title %}Tableau de Bord - Client{% endblock %}
+
+{% block page_title %}Tableau de Bord{% endblock %}
+
+{% block content %}
+<div class="dashboard-content">
+    <!-- Stats Overview -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon primary">
+                <i class="fas fa-shopping-bag"></i>
+            </div>
+            <div class="stat-value">15</div>
+            <div class="stat-label">Commandes totales</div>
+            <small class="text-success"><i class="fas fa-arrow-up"></i> 12% ce mois</small>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon success">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-value">12</div>
+            <div class="stat-label">Commandes livrées</div>
+            <small class="text-success"><i class="fas fa-arrow-up"></i> 8% ce mois</small>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon warning">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-value">2</div>
+            <div class="stat-label">En attente</div>
+            <small class="text-warning">En cours de traitement</small>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon info">
+                <i class="fas fa-star"></i>
+            </div>
+            <div class="stat-value">4.8</div>
+            <div class="stat-label">Note moyenne</div>
+            <small class="text-info">Basé sur 24 avis</small>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-grid">
+        <div class="chart-container">
+            <h3 class="chart-title">Historique des commandes</h3>
+            <canvas id="ordersChart" height="250"></canvas>
+        </div>
+        
+        <div class="chart-container">
+            <h3 class="chart-title">Dépenses par catégorie</h3>
+            <canvas id="expensesChart" height="250"></canvas>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="recent-orders">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="chart-title">Commandes récentes</h3>
+                    <a href="" class="btn btn-outline-primary btn-sm">
+                        Voir tout <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+                
+                <div class="order-item">
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">#CMD-0015</h6>
+                                <p class="mb-1">Supermarché Express</p>
+                                <small class="text-muted">15 articles • €85.50</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="order-status status-delivered">Livrée</span>
+                                <div class="text-muted small">15 Jan 2024</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="order-item">
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">#CMD-0014</h6>
+                                <p class="mb-1">Boulangerie du Coin</p>
+                                <small class="text-muted">8 articles • €24.30</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="order-status status-delivered">Livrée</span>
+                                <div class="text-muted small">14 Jan 2024</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="order-item">
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">#CMD-0013</h6>
+                                <p class="mb-1">Primeur Bio</p>
+                                <small class="text-muted">12 articles • €45.20</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="order-status status-pending">En cours</span>
+                                <div class="text-muted small">En cours de livraison</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="recent-orders">
+                <h3 class="chart-title">Favoris récents</h3>
+                
+                <div class="order-item">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="product-image">
+                            <i class="fas fa-apple-alt fa-2x text-success"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">Pommes Bio</h6>
+                            <small class="text-muted">€3.50/kg</small>
+                        </div>
+                        <button class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="order-item">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="product-image">
+                            <i class="fas fa-wine-bottle fa-2x text-primary"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">Lait entier</h6>
+                            <small class="text-muted">€1.20/l</small>
+                        </div>
+                        <button class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="order-item">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="product-image">
+                            <i class="fas fa-bread-slice fa-2x text-warning"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">Pain complet</h6>
+                            <small class="text-muted">€2.80</small>
+                        </div>
+                        <button class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-3">
+                    <a href="{% url 'appeler_page_favorie' %}" class="btn btn-primary btn-sm">
+                        Voir tous mes favoris
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="recent-orders">
+                <h3 class="chart-title">Actions rapides</h3>
+                <div class="row text-center">
+                    <div class="col-md-3 mb-3">
+                        <a href="#" class="btn btn-outline-primary d-flex flex-column align-items-center p-3">
+                            <i class="fas fa-plus fa-2x mb-2"></i>
+                            <span>Nouvelle commande</span>
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="" class="btn btn-outline-success d-flex flex-column align-items-center p-3">
+                            <i class="fas fa-history fa-2x mb-2"></i>
+                            <span>Mes commandes</span>
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'appeler_page_favorie' %}" class="btn btn-outline-danger d-flex flex-column align-items-center p-3">
+                            <i class="fas fa-heart fa-2x mb-2"></i>
+                            <span>Mes favoris</span>
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="#" class="btn btn-outline-info d-flex flex-column align-items-center p-3">
+                            <i class="fas fa-map-marker-alt fa-2x mb-2"></i>
+                            <span>Mes adresses</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Orders Chart
+    const ordersCtx = document.getElementById('ordersChart').getContext('2d');
+    const ordersChart = new Chart(ordersCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
+            datasets: [{
+                label: 'Commandes mensuelles',
+                data: [8, 10, 12, 9, 11, 15, 18, 16, 14, 12, 15, 18],
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        drawBorder: false
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+
+    // Expenses Chart
+    const expensesCtx = document.getElementById('expensesChart').getContext('2d');
+    const expensesChart = new Chart(expensesCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Alimentation', 'Électronique', 'Maison', 'Mode', 'Autres'],
+            datasets: [{
+                data: [45, 20, 15, 12, 8],
+                backgroundColor: [
+                    '#667eea',
+                    '#764ba2',
+                    '#f093fb',
+                    '#f5576c',
+                    '#4facfe'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

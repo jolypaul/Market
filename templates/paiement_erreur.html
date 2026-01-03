@@ -1,0 +1,262 @@
+{% extends layout %}
+
+{% block title %}Erreur de Paiement - Marché Virtuel{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-content">
+        <div class="error-icon">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="45" fill="#f8d7da" stroke="#dc3545" stroke-width="2"/>
+                <line x1="35" y1="35" x2="65" y2="65" stroke="#dc3545" stroke-width="4" stroke-linecap="round"/>
+                <line x1="65" y1="35" x2="35" y2="65" stroke="#dc3545" stroke-width="4" stroke-linecap="round"/>
+            </svg>
+        </div>
+        
+        <h1>Paiement Échoué</h1>
+        <p class="error-message">
+            Votre paiement n'a pas pu être traité. Veuillez vérifier vos informations et réessayer.
+        </p>
+        
+        {% if paiement.message_erreur %}
+        <div class="error-details">
+            <strong>Raison:</strong> {{ paiement.message_erreur }}
+        </div>
+        {% endif %}
+        
+        <div class="order-info">
+            <h2>Détails de la Commande</h2>
+            
+            <div class="info-box">
+                <div class="info-row">
+                    <span class="label">Numéro de Commande</span>
+                    <span class="value">#{{ commande.id }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Montant</span>
+                    <span class="value">{{ paiement.montant }} {{ paiement.devise|upper }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Statut du Paiement</span>
+                    <span class="value badge badge-error">{{ paiement.get_statut_display }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="troubleshooting">
+            <h2>Conseils pour Résoudre le Problème</h2>
+            <ul class="tips-list">
+                <li>Vérifiez que vous avez saisi le bon numéro de carte</li>
+                <li>Assurez-vous que la date d'expiration est correcte</li>
+                <li>Vérifiez le code CVV (3 chiffres au dos de la carte)</li>
+                <li>Vérifiez le solde de votre carte auprès de votre banque</li>
+                <li>Essayez une autre méthode de paiement</li>
+                <li>Contactez votre banque pour plus d'informations</li>
+            </ul>
+        </div>
+        
+        <div class="action-buttons">
+            <a href="{% url 'paiement_checkout' paiement.id %}" class="btn btn-primary">
+                Réessayer le Paiement
+            </a>
+            <a href="{% url 'vue_panier' %}" class="btn btn-outline">
+                Retour au Panier
+            </a>
+            <a href="{% url 'liste_commandes' %}" class="btn btn-outline">
+                Mes Commandes
+            </a>
+        </div>
+        
+        <div class="support-section">
+            <h3>Besoin d'Aide ?</h3>
+            <p>Si le problème persiste, notre équipe support est là pour vous aider.</p>
+            <div class="support-contacts">
+                <a href="mailto:support@marchevirtuel.com" class="support-link">
+                    <strong>📧 support@marchevirtuel.com</strong>
+                </a>
+                <a href="tel:+33123456789" class="support-link">
+                    <strong>📞 +33 (0) 1 23 45 67 89</strong>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .error-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+    
+    .error-content {
+        background: white;
+        padding: 3rem 2rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    
+    .error-icon {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 1.5rem;
+    }
+    
+    .error-icon svg {
+        width: 100%;
+        height: 100%;
+    }
+    
+    h1 {
+        color: #dc3545;
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .error-message {
+        font-size: 1.1rem;
+        color: #666;
+        margin-bottom: 1.5rem;
+    }
+    
+    .error-details {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        border-radius: 4px;
+        padding: 1rem;
+        color: #721c24;
+        margin-bottom: 2rem;
+        text-align: left;
+    }
+    
+    h2, h3 {
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        text-align: left;
+    }
+    
+    h2 {
+        font-size: 1.3rem;
+    }
+    
+    h3 {
+        font-size: 1.1rem;
+    }
+    
+    .info-box {
+        background: #f9f9f9;
+        padding: 1.5rem;
+        border-radius: 6px;
+        border-left: 4px solid #dc3545;
+        text-align: left;
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-row .label {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .info-row .value {
+        color: #666;
+    }
+    
+    .badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .badge-error {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .troubleshooting {
+        text-align: left;
+        background: #fff3cd;
+        padding: 1.5rem;
+        border-radius: 6px;
+        border-left: 4px solid #ffc107;
+        margin: 2rem 0;
+    }
+    
+    .tips-list {
+        list-style: none;
+        padding: 0;
+        margin: 1rem 0 0 0;
+    }
+    
+    .tips-list li {
+        padding: 0.5rem 0;
+        padding-left: 1.5rem;
+        position: relative;
+        color: #856404;
+    }
+    
+    .tips-list li:before {
+        content: "✓";
+        position: absolute;
+        left: 0;
+        color: #f0ad4e;
+        font-weight: bold;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin: 2rem 0;
+    }
+    
+    .action-buttons a {
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    .support-section {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background: #f0f8f7;
+        border-radius: 6px;
+        text-align: center;
+    }
+    
+    .support-contacts {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .support-link {
+        color: #007bff;
+        text-decoration: none;
+        padding: 0.75rem 1rem;
+        border: 1px solid #007bff;
+        border-radius: 4px;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+    
+    .support-link:hover {
+        background: #007bff;
+        color: white;
+    }
+</style>
+{% endblock %}

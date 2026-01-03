@@ -1,0 +1,578 @@
+{% extends 'base_client.html' %}
+{% load static %}
+{% block title %}Tous les Produits - Marché Virtuel{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); min-height: 100vh;">
+    <!-- En-tête avec filtre et recherche -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 3rem 2rem; border-radius: 15px; margin-bottom: 2rem;">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem;">
+                            <i class="bi bi-bag-heart me-3"></i>
+                            Découvrez nos produits
+                        </h1>
+                        <p style="font-size: 1.1rem; opacity: 0.9; margin-bottom: 0;">
+                            Explorez une sélection exceptionnelle de produits frais et de qualité 
+                            provenant de nos commerçants partenaires.
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 15px; padding: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.2);">
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <div style="position: relative;">
+                                        <i class="bi bi-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #6b7280; z-index: 2;"></i>
+                                        <input type="text" 
+                                               class="form-control" 
+                                               id="searchInput" 
+                                               placeholder="Rechercher un produit, une catégorie..."
+                                               style="padding-left: 45px; border-radius: 50px; border: 2px solid transparent; background: white;">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <select class="form-select" id="categoryFilter" style="border-radius: 50px; border: 2px solid transparent;">
+                                        <option value="">Toutes catégories</option>
+                                        {% for c in categorie %}
+                                        <option value="{{ c.nom|lower }}">{{ c.nom }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grille des produits -->
+    <div class="row">
+        <div class="col-12">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h3 style="color: #1f2937; font-weight: 700; margin: 0;">
+                    <i class="bi bi-grid-3x3-gap me-2"></i>
+                    Nos produits
+                    <span class="badge bg-primary ms-2" id="productCount" style="background: linear-gradient(135deg, #667eea, #764ba2) !important;">{{ produits|length }}</span>
+                </h3>
+            </div>
+
+            <div id="productsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+                {% for produit in produits %}
+                <div class="product-card" 
+                     data-category="{{ produit.categorie_id.nom|lower }}" 
+                     data-price="{{ produit.prix }}"
+                     data-stock="{{ produit.quantite_en_stock }}"
+                     data-merchant="{{ produit.Commercant_id.id }}"
+                     data-name="{{ produit.nom|lower }}"
+                     style="background: white; border-radius: 12px; box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08); transition: all 0.3s ease; position: relative; overflow: hidden; cursor: pointer;">
+                    
+                    <!-- Zone cliquable pour l'image et les infos produit -->
+                    <div class="product-clickable-area" data-product-id="{{ produit.id }}" style="text-decoration: none; color: inherit;">
+                        <div style="position: absolute; top: 10px; left: 10px; z-index: 2; display: flex; flex-direction: column; gap: 0.5rem;">
+                            {% if produit.quantite_en_stock == 0 %}
+                            <span style="padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: #ef4444; color: white;">Rupture</span>
+                            {% elif produit.quantite_en_stock < 10 %}
+                            <span style="padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: #f59e0b; color: white;">Stock limité</span>
+                            {% endif %}
+                        </div>
+
+                        <div style="position: relative; height: 200px; overflow: hidden;">
+                            {% if produit.image %}
+                            <img src="{{ produit.image.url }}" 
+                                 alt="{{ produit.nom }}" 
+                                 class="img-fluid product-image"
+                                 style="width: 100%; height: 100%; object-fit: cover; transition: all 0.3s ease;"
+                                 onerror="this.src='{}'">
+                            {% else %}
+                            <img src="{% static 'images/placeholder-product.jpg' %}" 
+                                 alt="{{ produit.nom }}" 
+                                 class="img-fluid product-image"
+                                 style="width: 100%; height: 100%; object-fit: cover; transition: all 0.3s ease;">
+                            {% endif %}
+                        </div>
+
+                        <div style="padding: 1.5rem;">
+                            <div style="font-size: 0.8rem; color: #667eea; font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase;">
+                                {{ produit.categorie_id.nom }}
+                            </div>
+                            <h4 style="font-size: 1.1rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; line-height: 1.4;">{{ produit.nom }}</h4>
+                            <p style="color: #6b7280; font-size: 0.9rem; margin-bottom: 1rem; line-height: 1.5;">{{ produit.description|truncatewords:15 }}</p>
+                            
+                            <div style="display: flex; align-items: center; font-size: 0.85rem; color: #6b7280; margin-bottom: 0.75rem;">
+                                <i class="bi bi-shop me-1"></i>
+                                {{ produit.Commercant_id.utilisateur.nom }}
+                            </div>
+
+                            <div style="margin-bottom: 1rem;">
+                                {% if produit.quantite_en_stock == 0 %}
+                                <span style="color: #ef4444; font-size: 0.85rem; font-weight: 600;">Rupture de stock</span>
+                                {% elif produit.quantite_en_stock < 10 %}
+                                <span style="color: #f59e0b; font-size: 0.85rem; font-weight: 600;">Plus que {{ produit.quantite_en_stock }} disponibles</span>
+                                {% else %}
+                                <span style="color: #10b981; font-size: 0.85rem; font-weight: 600;">En stock</span>
+                                {% endif %}
+                            </div>
+
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="display: flex; flex-direction: column;">
+                                    <span style="font-size: 1.25rem; font-weight: 800; color: #1f2937;">{{ produit.prix }} FCFA</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Zone des boutons d'action -->
+                    <div style="padding: 0 1.5rem 1.5rem 1.5rem; display: flex; gap: 0.75rem; justify-content: space-between; align-items: center;">
+                        <!-- Bouton Favori -->
+                        <div style="flex: 0 0 auto;">
+                            {% if produit.id in favoris_ids %}
+                                <!-- Bouton Retirer du favori -->
+                                <form action="{% url 'retirer_favori' produit.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <button type="submit" class="favorite-btn active" style="width:45px; height:45px; border-radius:50%; border:none; background:#ef4444; color:white;">
+                                        <i class="bi bi-heart-fill"></i>
+                                    </button>
+                                </form>
+                            {% else %}
+                                <!-- Bouton Ajouter au favori -->
+                                <form action="{% url 'ajouter_favori' produit.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <button type="submit" class="favorite-btn" style="width:45px; height:45px; border-radius:50%; border:none; background:linear-gradient(135deg,#ffffff,#f8fafc); color:#ef4444;">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+
+
+                        <!-- Bouton Ajouter au panier + bouton ouvrir mini-panier -->
+                        <div style="flex: 1; margin-left: 0.75rem; display:flex; gap:0.5rem; align-items:center;">
+                            <button class="btn-add-cart" 
+                                    data-product-id="{{ produit.id }}"
+                                    data-product-name="{{ produit.nom }}"
+                                    data-product-price="{{ produit.prix }}"
+                                    data-max-quantity="{{ produit.quantite_en_stock }}"
+                                    {% if produit.quantite_en_stock == 0 %}disabled{% endif %}
+                                    style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; padding: 0.75rem 1rem; font-weight: 600; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex:1;">
+                                <i class="bi bi-cart-plus"></i>
+                                <span>Ajouter au panier</span>
+                            </button>
+
+                            <!-- Petit bouton pour ouvrir directement le mini-panier et ajouter l'article -->
+                            <button type="button" class="btn btn-outline-secondary open-mini-cart-btn" 
+                                    onclick="addToCartAndShowMini('{{ produit.id }}', '{{ produit.nom|escapejs }}', '{{ produit.prix }}', {{ produit.quantite_en_stock }})"
+                                    {% if produit.quantite_en_stock == 0 %}disabled{% endif %}
+                                    style="width:45px; height:45px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center;">
+                                <i class="bi bi-cart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div style="text-align: center; padding: 4rem 2rem; color: #6b7280; grid-column: 1 / -1;">
+                    <i class="bi bi-inbox" style="font-size: 4rem; margin-bottom: 1rem; color: #d1d5db;"></i>
+                    <h4 style="margin-bottom: 1rem; color: #374151;">Aucun produit disponible</h4>
+                    <p>Revenez plus tard pour découvrir nos nouveaux produits.</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if produits.has_other_pages %}
+            <div style="margin-top: 3rem;">
+                <nav aria-label="Pagination des produits">
+                    <ul class="pagination justify-content-center">
+                        {% if produits.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ produits.previous_page_number }}" style="border-radius: 8px; margin: 0 0.25rem; border: 2px solid #e5e7eb; color: #1f2937; font-weight: 600;">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+
+                        {% for num in produits.paginator.page_range %}
+                            {% if produits.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link" style="background: #667eea; border-color: #667eea; border-radius: 8px; margin: 0 0.25rem;">{{ num }}</span>
+                            </li>
+                            {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}" style="border-radius: 8px; margin: 0 0.25rem; border: 2px solid #e5e7eb; color: #1f2937; font-weight: 600;">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if produits.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ produits.next_page_number }}" style="border-radius: 8px; margin: 0 0.25rem; border: 2px solid #e5e7eb; color: #1f2937; font-weight: 600;">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Style CSS amélioré -->
+<style>
+    .product-card {
+        transition: all 0.3s ease;
+    }
+
+    .product-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .product-card:hover .product-image {
+        transform: scale(1.08);
+    }
+
+    .product-clickable-area {
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .favorite-btn {
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .favorite-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+        transition: left 0.6s;
+    }
+
+    .favorite-btn:hover::before {
+        left: 100%;
+    }
+
+    .favorite-btn.active {
+        background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+        color: white !important;
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4) !important;
+    }
+
+    .favorite-btn:hover:not(.active) {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        background: linear-gradient(135deg, #fef2f2, #fecaca) !important;
+    }
+
+    .favorite-btn .bi-heart-fill {
+        display: none;
+    }
+
+    .favorite-btn.active .bi-heart {
+        display: none;
+    }
+
+    .favorite-btn.active .bi-heart-fill {
+        display: block;
+    }
+
+    .btn-add-cart {
+        transition: all 0.3s ease;
+    }
+
+    .btn-add-cart:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-add-cart:disabled {
+        background: #9ca3af !important;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Animations */
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+
+    @keyframes slideIn {
+        from { 
+            transform: translateX(100%); 
+            opacity: 0; 
+        }
+        to { 
+            transform: translateX(0); 
+            opacity: 1; 
+        }
+    }
+    
+    @keyframes slideOut {
+        from { 
+            transform: translateX(0); 
+            opacity: 1; 
+        }
+        to { 
+            transform: translateX(100%); 
+            opacity: 0; 
+        }
+    }
+
+    .favorite-btn.pulse {
+        animation: pulse 0.6s ease-in-out;
+    }
+</style>
+
+<!-- Script JavaScript amélioré -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Gestion de la redirection vers la page détaillée du produit
+        document.querySelectorAll('.product-clickable-area').forEach(area => {
+            area.addEventListener('click', function(e) {
+                // Empêcher la redirection si on clique sur les boutons d'action
+                if (!e.target.closest('.favorite-btn') && !e.target.closest('.btn-add-cart')) {
+                    const productId = this.dataset.productId;
+                    window.location.href = `/produit/${productId}/`; // À adapter selon vos URLs
+                }
+            });
+        });
+
+        // Gestion des boutons favoris
+        document.querySelectorAll('.favorite-btn').forEach(btn => {
+            // État initial basé sur le localStorage
+            const productId = btn.dataset.productId;
+            const isFavorite = localStorage.getItem(`favorite_${productId}`) === 'true';
+            
+            if (isFavorite) {
+                btn.classList.add('active');
+                btn.innerHTML = '<i class="bi bi-heart-fill"></i>';
+            }
+
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation(); // Empêcher la redirection du produit
+                
+                const productId = this.dataset.productId;
+                const productName = this.dataset.productName;
+                const isCurrentlyFavorite = this.classList.contains('active');
+                
+                // Animation de clic
+                this.classList.add('pulse');
+                
+                if (isCurrentlyFavorite) {
+                    // Retirer des favoris
+                    this.classList.remove('active');
+                    this.innerHTML = '<i class="bi bi-heart"></i>';
+                    localStorage.setItem(`favorite_${productId}`, 'false');
+                    
+                    showToast(`"${productName}" retiré des favoris`, 'warning');
+                } else {
+                    // Ajouter aux favoris
+                    this.classList.add('active');
+                    this.innerHTML = '<i class="bi bi-heart-fill"></i>';
+                    localStorage.setItem(`favorite_${productId}`, 'true');
+                    
+                    showToast(`"${productName}" ajouté aux favoris`, 'success');
+                }
+                
+                // Retirer l'animation de pulsation après un délai
+                setTimeout(() => {
+                    this.classList.remove('pulse');
+                }, 600);
+                
+                // Mettre à jour le compteur des favoris
+                updateFavoriteCount();
+            });
+        });
+
+        // Gestion des boutons d'ajout au panier
+        document.querySelectorAll('.btn-add-cart').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation(); // Empêcher la redirection du produit
+                
+                if (this.disabled) return;
+                
+                const productId = this.dataset.productId;
+                const productName = this.dataset.productName;
+                const productPrice = this.dataset.productPrice;
+                const maxQuantity = this.dataset.maxQuantity;
+                
+                // Appeler votre fonction d'ajout au panier
+                addToCart(productId, productName, productPrice, maxQuantity);
+            });
+        });
+
+        // Fonction d'ajout au panier
+        function addToCart(productId, productName, productPrice, maxQuantity) {
+            // Utiliser la fonction optimisée du base_client.html
+            if (typeof addItemToCart === 'function') {
+                addItemToCart({
+                    productId: String(productId),
+                    productName: String(productName).trim(),
+                    productPrice: parseFloat(productPrice),
+                    quantity: 1
+                });
+                showToast(`"${productName}" ajouté au panier`, 'success');
+            } else {
+                // Fallback si la fonction n'existe pas
+                let cart = JSON.parse(localStorage.getItem('shopping_cart')) || [];
+                const existingItem = cart.find(item => String(item.productId) === String(productId));
+                
+                if (existingItem) {
+                    if (existingItem.quantity < parseInt(maxQuantity)) {
+                        existingItem.quantity += 1;
+                        showToast(`Quantité de "${productName}" augmentée dans le panier`, 'success');
+                    } else {
+                        showToast(`Stock limité pour "${productName}"`, 'warning');
+                        return;
+                    }
+                } else {
+                    cart.push({
+                        productId: String(productId),
+                        productName: String(productName),
+                        productPrice: parseFloat(productPrice),
+                        quantity: 1
+                    });
+                    showToast(`"${productName}" ajouté au panier`, 'success');
+                }
+                localStorage.setItem('shopping_cart', JSON.stringify(cart));
+            }
+            
+            // Mettre à jour le compteur du panier
+            updateCartCount();
+            
+            // Animation du bouton
+            const btn = document.querySelector(`.btn-add-cart[data-product-id="${productId}"]`);
+            if (btn) {
+                btn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    btn.style.transform = '';
+                }, 300);
+            }
+        }
+
+        // Mettre à jour le compteur du panier
+        function updateCartCount() {
+            let cart;
+            try {
+                cart = JSON.parse(localStorage.getItem('shopping_cart')) || [];
+            } catch (e) {
+                cart = [];
+            }
+            const totalItems = cart.reduce((sum, item) => sum + (parseInt(item.quantity) || 0), 0);
+            
+            // Mettre à jour l'élément d'affichage du compteur de panier (dans le template)
+            const cartBadges = document.querySelectorAll('.cart-count-badge');
+            cartBadges.forEach(badge => {
+                badge.textContent = totalItems;
+                badge.style.display = totalItems > 0 ? 'inline-block' : 'none';
+            });
+        }
+
+        // Mettre à jour le compteur des favoris
+        function updateFavoriteCount() {
+            const favoriteCount = document.querySelectorAll('.favorite-btn.active').length;
+            const favoriteBadge = document.getElementById('favoriteCount');
+            
+            if (favoriteBadge) {
+                favoriteBadge.textContent = favoriteCount;
+                favoriteBadge.style.display = favoriteCount > 0 ? 'inline-block' : 'none';
+            }
+        }
+
+        // Fonction pour afficher les toasts
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#10b981' : type === 'warning' ? '#f59e0b' : '#ef4444'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+                max-width: 300px;
+                font-weight: 600;
+                border-left: 4px solid ${type === 'success' ? '#059669' : type === 'warning' ? '#d97706' : '#dc2626'};
+            `;
+            toast.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'heart-fill'}" 
+                       style="font-size: 1.2rem;"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+        // Filtrage des produits
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const productCards = document.querySelectorAll('.product-card');
+        const productCount = document.getElementById('productCount');
+
+        function filterProducts() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const categoryValue = categoryFilter.value.toLowerCase();
+
+            let visibleCount = 0;
+
+            productCards.forEach(card => {
+                const productName = card.dataset.name;
+                const productCategory = card.dataset.category;
+
+                let visible = true;
+
+                if (searchTerm && !productName.includes(searchTerm)) {
+                    visible = false;
+                }
+
+                if (categoryValue && !productCategory.includes(categoryValue)) {
+                    visible = false;
+                }
+
+                if (visible) {
+                    visibleCount++;
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            productCount.textContent = visibleCount;
+        }
+
+        searchInput.addEventListener('input', filterProducts);
+        categoryFilter.addEventListener('change', filterProducts);
+
+        // Initialisation des compteurs
+        updateCartCount();
+        updateFavoriteCount();
+    });
+</script>
+{% endblock %}

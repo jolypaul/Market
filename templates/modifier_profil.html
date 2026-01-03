@@ -1,0 +1,660 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Modifier le Profil - Marché Virtuel{% endblock %}
+
+{% block extra_css %}
+<style>
+    .edit-profile-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 40px 0;
+    }
+    
+    .profile-edit-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    
+    .profile-edit-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 30px;
+        color: white;
+        text-align: center;
+    }
+    
+    .profile-edit-content {
+        padding: 40px;
+    }
+    
+    .form-section {
+        margin-bottom: 40px;
+        padding: 30px;
+        background: #f8f9fa;
+        border-radius: 15px;
+        border-left: 4px solid #667eea;
+    }
+    
+    .section-title {
+        color: #2c3e50;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #e9ecef;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .form-group-custom {
+        margin-bottom: 25px;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .form-control-custom {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 12px 15px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+    
+    .form-control-custom:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        outline: none;
+    }
+    
+    .image-upload-container {
+        text-align: center;
+        padding: 30px;
+        border: 2px dashed #dee2e6;
+        border-radius: 15px;
+        background: #f8f9fa;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .image-upload-container:hover {
+        border-color: #667eea;
+        background: #e9ecef;
+    }
+    
+    .profile-image-preview {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 15px;
+    }
+    
+    .image-placeholder {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: #dee2e6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 50px;
+        color: #6c757d;
+        margin: 0 auto 15px;
+    }
+    
+    .btn-custom {
+        padding: 12px 30px;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    
+    .btn-primary-custom {
+        background: #667eea;
+        color: white;
+    }
+    
+    .btn-primary-custom:hover {
+        background: #5a6fd8;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-outline-custom {
+        background: transparent;
+        border: 2px solid #6c757d;
+        color: #6c757d;
+    }
+    
+    .btn-outline-custom:hover {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .role-badge {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        margin: 5px;
+    }
+    
+    .badge-client { background: #28a745; color: white; }
+    .badge-commercant { background: #ffc107; color: #212529; }
+    .badge-livreur { background: #17a2b8; color: white; }
+    .badge-admin { background: #dc3545; color: white; }
+    
+    .error-message {
+        color: #dc3545;
+        font-size: 0.875em;
+        margin-top: 5px;
+    }
+    
+    .info-text {
+        color: #6c757d;
+        font-size: 0.875em;
+        margin-top: 5px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .profile-edit-content {
+            padding: 20px;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn-custom {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="edit-profile-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="profile-edit-card">
+                    <!-- En-tête -->
+                    <div class="profile-edit-header">
+                        <h1 class="mb-3"><i class="fas fa-user-edit me-2"></i>Modifier le Profil</h1>
+                        <div class="role-badges">
+                            {% if role == 'client' %}
+                                <span class="badge-client">
+                                    <i class="fas fa-user me-1"></i>Client
+                                </span>
+                            {% endif %}
+                            {% if role == 'commercant' %}
+                                <span class="badge-commercant">
+                                    <i class="fas fa-store me-1"></i>Commerçant
+                                </span>
+                            {% endif %}
+                            {% if role == 'livreur' %}
+                                <span class="badge-livreur">
+                                    <i class="fas fa-motorcycle me-1"></i>Livreur
+                                </span>
+                            {% endif %}
+                            {% if role == 'administrateur' %}
+                                <span class="badge-admin">
+                                    <i class="fas fa-cog me-1"></i>{{ administrateur.get_role_display }}
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Formulaire de modification -->
+                    <div class="profile-edit-content">
+                        <!-- Messages -->
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <form method="POST" enctype="multipart/form-data" id="profileForm" action="{% url 'modifier_profil'%}">
+                            {% csrf_token %}
+                            
+                            <!-- Section Photo de profil -->
+                            <div class="form-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-camera text-primary"></i>
+                                    Photo de profil
+                                </h3>
+                                
+                                <div class="image-upload-container" onclick="document.getElementById('image').click()">
+                                    {% if utilisateur.image %}
+                                        <img src="{{ utilisateur.image.url }}" alt="Photo de profil actuelle" class="profile-image-preview" id="imagePreview">
+                                    {% else %}
+                                        <div class="image-placeholder">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                    {% endif %}
+                                    <p class="mb-2">Cliquez pour changer la photo de profil</p>
+                                    <small class="text-muted">Formats supportés: JPG, PNG, GIF - Max 5MB</small>
+                                    <input type="file" name="image" id="image" accept="image/*" style="display: none;">
+                                </div>
+                            </div>
+
+                            <!-- Informations de base Utilisateur -->
+                            <div class="form-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-user text-primary"></i>
+                                    Informations personnelles
+                                </h3>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label class="form-label" for="nom">
+                                                <i class="fas fa-signature"></i>
+                                                Nom complet *
+                                            </label>
+                                            <input type="text" 
+                                                   name="nom" 
+                                                   id="nom" 
+                                                   class="form-control form-control-custom" 
+                                                   value="{{ utilisateur.nom }}"
+                                                   placeholder="Votre nom complet"
+                                                   required>
+                                            {% if errors.nom %}
+                                                <div class="error-message">
+                                                    {% for error in errors.nom %}
+                                                        <small>{{ error }}</small>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label class="form-label" for="email">
+                                                <i class="fas fa-envelope"></i>
+                                                Adresse email *
+                                            </label>
+                                            <input type="email" 
+                                                   name="email" 
+                                                   id="email" 
+                                                   class="form-control form-control-custom" 
+                                                   value="{{ utilisateur.email }}"
+                                                   placeholder="votre@email.com"
+                                                   required>
+                                            {% if errors.email %}
+                                                <div class="error-message">
+                                                    {% for error in errors.email %}
+                                                        <small>{{ error }}</small>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Informations spécifiques CLIENT -->
+                            {% if role == 'client' %}
+                            <div class="form-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-map-marker-alt text-primary"></i>
+                                    Informations client
+                                </h3>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label class="form-label" for="adresse">
+                                                <i class="fas fa-home"></i>
+                                                Adresse *
+                                            </label>
+                                            <input type="text" 
+                                                   name="adresse" 
+                                                   id="adresse" 
+                                                   class="form-control form-control-custom" 
+                                                   value="{{ utilisateur.client.adresse }}"
+                                                   placeholder="Votre adresse complète"
+                                                   required>
+                                            {% if errors.adresse %}
+                                                <div class="error-message">
+                                                    {% for error in errors.adresse %}
+                                                        <small>{{ error }}</small>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label class="form-label" for="telephone">
+                                                <i class="fas fa-phone"></i>
+                                                Téléphone *
+                                            </label>
+                                            <input type="tel" 
+                                                   name="telephone" 
+                                                   id="telephone" 
+                                                   class="form-control form-control-custom" 
+                                                   value="{{ utilisateur.client.telephone }}"
+                                                   placeholder="06 12 34 56 78"
+                                                   required>
+                                            {% if errors.telephone %}
+                                                <div class="error-message">
+                                                    {% for error in errors.telephone %}
+                                                        <small>{{ error }}</small>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Informations spécifiques COMMERCANT -->
+                            {% if role == 'commercant' %}
+                            <div class="form-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-store text-primary"></i>
+                                    Informations boutique
+                                </h3>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label class="form-label" for="boutique_nom">
+                                                <i class="fas fa-store"></i>
+                                                Nom de la boutique
+                                            </label>
+                                            <input type="text" 
+                                                   name="boutique_nom" 
+                                                   id="boutique_nom" 
+                                                   class="form-control form-control-custom" 
+                                                   value="{{ utilisateur.commercant.boutique_nom }}"
+                                                   placeholder="Nom de votre boutique">
+                                            <div class="info-text">Optionnel</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label class="form-label" for="adresse_boutique">
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                Adresse de la boutique
+                                            </label>
+                                            <input type="text" 
+                                                   name="adresse_boutique" 
+                                                   id="adresse_boutique" 
+                                                   class="form-control form-control-custom" 
+                                                   value="{{ utilisateur.commercant.adresse_boutique }}"
+                                                   placeholder="Adresse de votre boutique">
+                                            <div class="info-text">Optionnel</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Informations spécifiques LIVREUR -->
+                            {% if role == 'livreur' %}
+                            <div class="form-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-motorcycle text-primary"></i>
+                                    Informations livreur
+                                </h3>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label class="form-label" for="zone_de_livraison">
+                                                <i class="fas fa-map-marked-alt"></i>
+                                                Zone de livraison *
+                                            </label>
+                                            <input type="text" 
+                                                   name="zone_de_livraison" 
+                                                   id="zone_de_livraison" 
+                                                   class="form-control form-control-custom" 
+                                                   value="{{ livreur.zone_de_livraison }}"
+                                                   placeholder="Ex: Paris Centre, Lyon Nord, etc."
+                                                   required>
+                                            {% if errors.zone_de_livraison %}
+                                                <div class="error-message">
+                                                    {% for error in errors.zone_de_livraison %}
+                                                        <small>{{ error }}</small>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label class="form-label" for="telephone_livreur">
+                                                <i class="fas fa-phone"></i>
+                                                Téléphone
+                                            </label>
+                                            <input type="tel" 
+                                                   name="telephone_livreur" 
+                                                   id="telephone_livreur" 
+                                                   class="form-control form-control-custom" 
+                                                   value="{{ livreur.telephone }}"
+                                                   placeholder="06 12 34 56 78">
+                                            <div class="info-text">Optionnel</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Informations spécifiques ADMINISTRATEUR -->
+                            {% if administrateur %}
+                            <div class="form-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-cog text-primary"></i>
+                                    Informations administrateur
+                                </h3>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label class="form-label" for="role">
+                                                <i class="fas fa-user-shield"></i>
+                                                Rôle
+                                            </label>
+                                            <select name="role" id="role" class="form-control form-control-custom" {% if not request.user.is_superuser %}disabled{% endif %}>
+                                                <option value="admin" {% if administrateur.role == 'admin' %}selected{% endif %}>Admin</option>
+                                                <option value="superadmin" {% if administrateur.role == 'superadmin' %}selected{% endif %}>Super Admin</option>
+                                            </select>
+                                            {% if not request.user.is_superuser %}
+                                                <div class="info-text">Seul un Super Admin peut modifier le rôle</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label class="form-label">
+                                                <i class="fas fa-calendar-alt"></i>
+                                                Statut du compte
+                                            </label>
+                                            <div class="d-flex gap-3 mt-2">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="is_active" id="is_active" {% if utilisateur.is_active %}checked{% endif %}>
+                                                    <label class="form-check-label" for="is_active">
+                                                        Compte actif
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="is_staff" id="is_staff" {% if utilisateur.is_staff %}checked{% endif %}>
+                                                    <label class="form-check-label" for="is_staff">
+                                                        Accès staff
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Section mot de passe -->
+                            <div class="form-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-lock text-primary"></i>
+                                    Sécurité
+                                </h3>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label class="form-label" for="nouveau_mot_de_passe">
+                                                <i class="fas fa-key"></i>
+                                                Nouveau mot de passe
+                                            </label>
+                                            <input type="password" 
+                                                   name="nouveau_mot_de_passe" 
+                                                   id="nouveau_mot_de_passe" 
+                                                   class="form-control form-control-custom" 
+                                                   placeholder="Laisser vide pour ne pas changer">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label class="form-label" for="confirmation_mot_de_passe">
+                                                <i class="fas fa-key"></i>
+                                                Confirmation mot de passe
+                                            </label>
+                                            <input type="password" 
+                                                   name="confirmation_mot_de_passe" 
+                                                   id="confirmation_mot_de_passe" 
+                                                   class="form-control form-control-custom" 
+                                                   placeholder="Confirmer le nouveau mot de passe">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-text">
+                                    <i class="fas fa-info-circle"></i>
+                                    Remplissez ces champs uniquement si vous souhaitez changer votre mot de passe.
+                                </div>
+                                {% if errors.mot_de_passe %}
+                                    <div class="error-message">
+                                        {% for error in errors.mot_de_passe %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Boutons d'action -->
+                            <div class="action-buttons">
+                                <a href="{% url 'call_profil' %}" class="btn btn-custom btn-outline-custom">
+                                    <i class="fas fa-times"></i> Annuler
+                                </a>
+                                <button type="submit" class="btn btn-custom btn-primary-custom">
+                                    <i class="fas fa-save"></i> Enregistrer les modifications
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Prévisualisation de l'image
+        const imageInput = document.getElementById('image');
+        const imagePreview = document.getElementById('imagePreview');
+        
+        if (imageInput) {
+            imageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Validation de la taille
+                    if (file.size > 5 * 1024 * 1024) { // 5MB
+                        alert('Le fichier est trop volumineux. Maximum 5MB autorisé.');
+                        this.value = '';
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        if (imagePreview) {
+                            imagePreview.src = e.target.result;
+                        } else {
+                            // Créer une prévisualisation si elle n'existe pas
+                            const placeholder = document.querySelector('.image-placeholder');
+                            if (placeholder) {
+                                placeholder.innerHTML = `<img src="${e.target.result}" class="profile-image-preview" alt="Preview" id="imagePreview">`;
+                            }
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+        
+        // Validation des mots de passe
+        const form = document.getElementById('profileForm');
+        form.addEventListener('submit', function(e) {
+            const nouveauMdp = document.getElementById('nouveau_mot_de_passe').value;
+            const confirmationMdp = document.getElementById('confirmation_mot_de_passe').value;
+            
+            if (nouveauMdp && nouveauMdp !== confirmationMdp) {
+                e.preventDefault();
+                alert('Les mots de passe ne correspondent pas.');
+                return false;
+            }
+            
+            if (nouveauMdp && nouveauMdp.length < 6) {
+                e.preventDefault();
+                alert('Le mot de passe doit contenir au moins 6 caractères.');
+                return false;
+            }
+        });
+        
+        // Auto-dismiss alerts
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            setTimeout(function() {
+                if (alert && alert.classList.contains('show')) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }
+            }, 5000);
+        });
+    });
+</script>
+{% endblock %}

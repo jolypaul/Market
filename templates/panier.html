@@ -1,0 +1,268 @@
+{% extends layout %}
+
+{% block title %}Mon Panier - Marché Virtuel{% endblock %}
+
+{% block content %}
+<div class="panier-container">
+    <h1>Mon Panier</h1>
+    
+    {% if messages %}
+        <div class="alert-container">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    {% if articles %}
+        <div class="panier-items">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Produit</th>
+                        <th>Prix Unitaire</th>
+                        <th>Quantité</th>
+                        <th>Sous-total</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for article in articles %}
+                    <tr class="article-row" data-article-id="{{ article.id }}">
+                        <td>
+                            <div class="produit-info">
+                                {% if article.produit.image %}
+                                    <img src="{{ article.produit.image.url }}" alt="{{ article.produit.nom }}" class="produit-thumb">
+                                {% endif %}
+                                <span>{{ article.produit.nom }}</span>
+                            </div>
+                        </td>
+                        <td class="prix-unitaire">{{ article.prix_unitaire }} €</td>
+                        <td>
+                            <input type="number" min="1" max="{{ article.produit.quantite_en_stock }}" 
+                                   value="{{ article.quantite }}" class="quantite-input" 
+                                   data-article-id="{{ article.id }}">
+                        </td>
+                        <td class="sous-total">{{ article.get_subtotal }} €</td>
+                        <td>
+                            <button class="btn btn-sm btn-danger retirer-btn" data-article-id="{{ article.id }}">
+                                Retirer
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="panier-resume">
+            <div class="resume-box">
+                <div class="resume-row">
+                    <span>Articles:</span>
+                    <span class="nombre-articles">{{ nombre_articles }}</span>
+                </div>
+                <div class="resume-row">
+                    <span>Sous-total:</span>
+                    <span class="total-amount">{{ total }} €</span>
+                </div>
+                <div class="resume-row">
+                    <span>Frais de port:</span>
+                    <span>Gratuit (à partir de 30€)</span>
+                </div>
+                <div class="resume-row total">
+                    <strong>Total:</strong>
+                    <strong class="total-final">{{ total }} €</strong>
+                </div>
+            </div>
+            
+            <div class="panier-actions">
+                <a href="{% url 'commande:creer_commande' %}" class="btn btn-primary btn-lg">
+                    Procéder au Paiement
+                </a>
+                <a href="{% url 'tout_les_produits' %}" class="btn btn-outline">
+                    Continuer vos Achats
+                </a>
+                <form method="post" action="{% url 'vider_panier' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Êtes-vous sûr de vouloir vider votre panier ?')">
+                        Vider le Panier
+                    </button>
+                </form>
+            </div>
+        </div>
+    {% else %}
+        <div class="panier-vide">
+            <div class="empty-state">
+                <i class="icon-shopping-cart"></i>
+                <h2>Votre panier est vide</h2>
+                <p>Commencez à acheter pour remplir votre panier!</p>
+                <a href="{% url 'tout_les_produits' %}" class="btn btn-primary">
+                    Découvrir nos produits
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .panier-container {
+        max-width: 1000px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+    
+    .panier-items {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .table {
+        margin: 0;
+    }
+    
+    .produit-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .produit-thumb {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+    
+    .quantite-input {
+        width: 80px;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    
+    .panier-resume {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+    
+    .resume-box {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .resume-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .resume-row.total {
+        font-size: 1.2rem;
+        color: #007bff;
+        border: none;
+        padding-top: 1rem;
+    }
+    
+    .panier-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .panier-vide {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+    
+    .empty-state {
+        background: white;
+        padding: 3rem;
+        border-radius: 8px;
+    }
+    
+    .empty-state .icon-shopping-cart {
+        font-size: 4rem;
+        color: #ddd;
+        display: block;
+        margin-bottom: 1rem;
+    }
+    
+    .alert-container {
+        margin-bottom: 2rem;
+    }
+    
+    .alert {
+        padding: 1rem;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+    }
+    
+    .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .alert-error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Modifier quantité
+    document.querySelectorAll('.quantite-input').forEach(input => {
+        input.addEventListener('change', function() {
+            const articleId = this.dataset.articleId;
+            const quantite = this.value;
+            
+            fetch(`{% url 'modifier_quantite_panier' article_id=0 %}`.replace('0', articleId), {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'quantite=' + quantite
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Erreur: ' + data.message);
+                    location.reload();
+                }
+            });
+        });
+    });
+    
+    // Retirer article
+    document.querySelectorAll('.retirer-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const articleId = this.dataset.articleId;
+            
+            if (confirm('Êtes-vous sûr de vouloir retirer cet article ?')) {
+                fetch(`{% url 'retirer_panier' article_id=0 %}`.replace('0', articleId))
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert('Erreur: ' + data.message);
+                        }
+                    });
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

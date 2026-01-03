@@ -1,0 +1,416 @@
+<!-- templates/avis/dashboard_client.html -->
+{% extends 'base_client.html' %}
+{% load static %}
+
+{% block title %}Mes Avis & Commentaires{% endblock %}
+
+{% block page_title %}Mes Avis & Commentaires{% endblock %}
+
+{% block extra_css %}
+<style>
+.avis-card {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.avis-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.card-hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.star-rating {
+    color: #ffc107;
+}
+
+.badge-count {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: 2px solid white;
+}
+
+.quick-action-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+    border: none;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.quick-action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.action-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.commentaire-item {
+    border-left: 4px solid #17a2b8;
+    transition: background-color 0.3s ease;
+}
+
+.commentaire-item:hover {
+    background-color: #f8f9fa;
+}
+
+.avis-item {
+    border-left: 4px solid #28a745;
+    transition: background-color 0.3s ease;
+}
+
+.avis-item:hover {
+    background-color: #f8f9fa;
+}
+
+.empty-state {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- En-tête avec statistiques -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card avis-card bg-gradient-primary text-white">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2 class="mb-2">
+                                <i class="fas fa-comments me-2"></i>
+                                Mes Avis & Commentaires
+                            </h2>
+                            <p class="mb-0 opacity-75">Gérez tous vos retours sur les produits et commerçants</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="bg-white bg-opacity-25 rounded p-3 d-inline-block">
+                                <h3 class="mb-0 text-white">{{ avis_count|default:0 }}</h3>
+                                <small class="opacity-75">Avis publiés</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="quick-action-card card-hover">
+                <div class="action-icon text-warning">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h5>Avis Produit</h5>
+                <p class="text-muted mb-3">Évaluez un produit acheté</p>
+                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalAvisProduit">
+                    <i class="fas fa-plus me-1"></i>Nouvel Avis
+                </button>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="quick-action-card card-hover">
+                <div class="action-icon text-info">
+                    <i class="fas fa-store"></i>
+                </div>
+                <h5>Commentaire Commerçant</h5>
+                <p class="text-muted mb-3">Laissez un commentaire à un commerçant</p>
+                <button type="button" class="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#modalCommentaireCommercant">
+                    <i class="fas fa-plus me-1"></i>Nouveau Commentaire
+                </button>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="quick-action-card card-hover">
+                <div class="action-icon text-success">
+                    <i class="fas fa-chart-star"></i>
+                </div>
+                <h5>Avis Commerçant</h5>
+                <p class="text-muted mb-3">Notez un commerçant</p>
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalAvisCommercant">
+                    <i class="fas fa-plus me-1"></i>Nouvel Avis
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Avis Produits -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card avis-card">
+                <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-star me-2"></i>
+                        Mes Avis Produits
+                    </h5>
+                    <span class="badge badge-count">{{ mes_avis.count }}</span>
+                </div>
+                <div class="card-body">
+                    {% if mes_avis %}
+                    <div class="row">
+                        {% for avis in mes_avis %}
+                        <div class="col-lg-6 mb-3">
+                            <div class="card border-warning avis-item">
+                                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                    <strong class="text-dark">{{ avis.produit.nom }}</strong>
+                                    <div class="star-rating">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= avis.note %}
+                                                <i class="fas fa-star"></i>
+                                            {% else %}
+                                                <i class="far fa-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <small class="text-muted ms-1">({{ avis.note }}/5)</small>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">{{ avis.commentaire }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar me-1"></i>
+                                            {{ avis.date_creation|date:"d/m/Y H:i" }}
+                                        </small>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-outline-primary btn-sm" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#modalAvisProduit"
+                                                    data-avis-id="{{ avis.id }}"
+                                                    data-produit-id="{{ avis.produit.id }}"
+                                                    data-note="{{ avis.note }}"
+                                                    data-commentaire="{{ avis.commentaire }}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <a href="{% url 'supprimer_avis' avis.id %}" class="btn btn-outline-danger btn-sm">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-star"></i>
+                        <h5 class="text-muted">Aucun avis produit</h5>
+                        <p class="text-muted">Vous n'avez pas encore d'avis sur les produits</p>
+                        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalAvisProduit">
+                            <i class="fas fa-plus me-1"></i>Rédiger un avis
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Commentaires Commerçants -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card avis-card">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-comments me-2"></i>
+                        Mes Commentaires Commerçants
+                    </h5>
+                    <span class="badge badge-count">{{ mes_commentaires.count }}</span>
+                </div>
+                <div class="card-body">
+                    {% if mes_commentaires %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Commerçant</th>
+                                    <th>Commentaire</th>
+                                    <th>Date</th>
+                                    <th>Réponses</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for commentaire in mes_commentaires %}
+                                <tr class="commentaire-item">
+                                    <td>
+                                        <strong>{{ commentaire.commercant.utilisateur.nom }}</strong>
+                                    </td>
+                                    <td>{{ commentaire.commentaire|truncatewords:10 }}</td>
+                                    <td>
+                                        <small class="text-muted">
+                                            {{ commentaire.date_creation|date:"d/m/Y" }}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if commentaire.reponses.count > 0 %}bg-success{% else %}bg-secondary{% endif %}">
+                                            {{ commentaire.reponses.count }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="" class="btn btn-outline-info btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-outline-primary btn-sm"
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#modalCommentaireCommercant"
+                                                    data-commentaire-id="{{ commentaire.id }}"
+                                                    data-commercant-id="{{ commentaire.commercant.id }}"
+                                                    data-commentaire="{{ commentaire.commentaire }}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-comments"></i>
+                        <h5 class="text-muted">Aucun commentaire</h5>
+                        <p class="text-muted">Vous n'avez pas encore commenté de commerçants</p>
+                        <button type="button" class="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#modalCommentaireCommercant">
+                            <i class="fas fa-plus me-1"></i>Écrire un commentaire
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Avis Commerçants -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card avis-card">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-star me-2"></i>
+                        Mes Avis Commerçants
+                    </h5>
+                    <span class="badge badge-count">{{ mes_avis_commercant.count }}</span>
+                </div>
+                <div class="card-body">
+                    {% if mes_avis_commercant %}
+                    <div class="row">
+                        {% for avis in mes_avis_commercant %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-success h-100 avis-item">
+                                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                                    <strong>{{ avis.commercant.utilisateur.nom }}</strong>
+                                    <span class="badge bg-warning text-dark">
+                                        {{ avis.note }}/5
+                                    </span>
+                                </div>
+                                <div class="card-body">
+                                    {% if avis.commentaire %}
+                                        <p class="card-text">{{ avis.commentaire }}</p>
+                                    {% else %}
+                                        <p class="card-text text-muted fst-italic">Aucun commentaire</p>
+                                    {% endif %}
+                                    <div class="mt-auto">
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar me-1"></i>
+                                            {{ avis.date_creation|date:"d/m/Y" }}
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <div class="btn-group w-100">
+                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#modalAvisCommercant"
+                                                data-avis-commercant-id="{{ avis.id }}"
+                                                data-commercant-id="{{ avis.commercant.id }}"
+                                                data-note="{{ avis.note }}"
+                                                data-commentaire="{{ avis.commentaire|default:'' }}">
+                                            <i class="fas fa-edit me-1"></i> Modifier
+                                        </button>
+                                        <a href="{% url 'supprimer_avis_commercant' avis.id %}" class="btn btn-outline-danger btn-sm">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-chart-star"></i>
+                        <h5 class="text-muted">Aucun avis commerçant</h5>
+                        <p class="text-muted">Vous n'avez pas encore noté de commerçants</p>
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalAvisCommercant">
+                            <i class="fas fa-plus me-1"></i>Noter un commerçant
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals pour les formulaires -->
+{% include 'avis_modals_client.html' %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animation des cartes
+    const cards = document.querySelectorAll('.card-hover');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+        });
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+
+    // Gestion des modals
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        modal.addEventListener('show.bs.modal', function() {
+            document.body.style.overflow = 'hidden';
+        });
+        modal.addEventListener('hidden.bs.modal', function() {
+            document.body.style.overflow = 'auto';
+        });
+    });
+});
+</script>
+{% endblock %}

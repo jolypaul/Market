@@ -1,0 +1,254 @@
+{% extends layout %}
+
+{% block title %}Paiement Réussi - Marché Virtuel{% endblock %}
+
+{% block content %}
+<div class="success-container">
+    <div class="success-content">
+        <div class="success-icon">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="45" fill="#d4edda" stroke="#28a745" stroke-width="2"/>
+                <path d="M30 50 L45 65 L70 35" stroke="#28a745" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        
+        <h1>Paiement Réussi !</h1>
+        <p class="success-message">
+            Merci pour votre achat. Votre commande a été confirmée.
+        </p>
+        
+        <div class="order-info">
+            <h2>Détails de la Commande</h2>
+            
+            <div class="info-box">
+                <div class="info-row">
+                    <span class="label">Numéro de Commande</span>
+                    <span class="value">#{{ commande.id }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Montant Payé</span>
+                    <span class="value">{{ paiement.montant }} {{ paiement.devise|upper }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Numéro de Référence Paiement</span>
+                    <span class="value">{{ paiement.reference }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Adresse de Livraison</span>
+                    <span class="value">{{ commande.adresse_livraison }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Statut</span>
+                    <span class="value badge badge-success">{{ commande.get_statut_display }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="articles-info">
+            <h2>Articles Commandés</h2>
+            <div class="articles-table">
+                {% for article in commande.articles.all %}
+                <div class="article-row">
+                    <div class="article-name">
+                        <strong>{{ article.produit.nom }}</strong>
+                    </div>
+                    <div class="article-qty">{{ article.quantite }}x</div>
+                    <div class="article-price">{{ article.sous_total }} €</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="next-steps">
+            <h2>Prochaines Étapes</h2>
+            <ol class="steps-list">
+                <li>Vous recevrez un email de confirmation dans quelques minutes</li>
+                <li>Nous vous enverrons un numéro de suivi dès que votre colis sera expédié</li>
+                <li>Vous pouvez suivre votre commande depuis votre tableau de bord</li>
+                <li>Livraison estimée : 2-3 jours ouvrables</li>
+            </ol>
+        </div>
+        
+        <div class="action-buttons">
+            <a href="{% url 'detail_commande' commande.id %}" class="btn btn-primary">
+                Voir la Commande Complète
+            </a>
+            <a href="{% url 'liste_commandes' %}" class="btn btn-outline">
+                Mes Commandes
+            </a>
+            <a href="{% url 'tout_les_produits' %}" class="btn btn-outline">
+                Continuer les Achats
+            </a>
+        </div>
+        
+        <div class="support-info">
+            <p>Une question ? <a href="#">Contactez notre support</a> ou appelez <strong>+33 (0) 1 23 45 67 89</strong></p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .success-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+    
+    .success-content {
+        background: white;
+        padding: 3rem 2rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    
+    .success-icon {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 1.5rem;
+    }
+    
+    .success-icon svg {
+        width: 100%;
+        height: 100%;
+    }
+    
+    h1 {
+        color: #28a745;
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .success-message {
+        font-size: 1.1rem;
+        color: #666;
+        margin-bottom: 2rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        text-align: left;
+    }
+    
+    .order-info,
+    .articles-info,
+    .next-steps {
+        text-align: left;
+        margin-bottom: 2rem;
+    }
+    
+    .info-box {
+        background: #f9f9f9;
+        padding: 1.5rem;
+        border-radius: 6px;
+        border-left: 4px solid #28a745;
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-row .label {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .info-row .value {
+        color: #666;
+    }
+    
+    .badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .badge-success {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .articles-table {
+        background: #f9f9f9;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    
+    .article-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        padding: 1rem;
+        border-bottom: 1px solid #eee;
+        align-items: center;
+    }
+    
+    .article-row:last-child {
+        border-bottom: none;
+    }
+    
+    .article-name {
+        text-align: left;
+    }
+    
+    .article-qty,
+    .article-price {
+        text-align: right;
+    }
+    
+    .steps-list {
+        background: #f0f8f7;
+        padding: 1.5rem 2rem;
+        border-radius: 6px;
+        border-left: 4px solid #17a2b8;
+    }
+    
+    .steps-list li {
+        margin-bottom: 0.75rem;
+        color: #333;
+    }
+    
+    .steps-list li:last-child {
+        margin-bottom: 0;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin: 2rem 0;
+    }
+    
+    .action-buttons a {
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    .support-info {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #eee;
+        color: #666;
+    }
+    
+    .support-info a {
+        color: #007bff;
+        text-decoration: none;
+    }
+    
+    .support-info a:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}

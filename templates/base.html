@@ -1,0 +1,186 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <meta name="description" content="Marché Virtuel - Votre plateforme d'achat en ligne">
+    <title>{% block title %}Marché Virtuel{% endblock %}</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary d-flex align-items-center" href="/">
+                <i class="fas fa-store me-2"></i>
+                Marché Virtuel
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav me-auto fw-semibold">
+                    <li class="nav-item">
+                        <a href="{% url 'produit' %}" class="nav-link {% if request.resolver_match.url_name == 'produit' %}active{% endif %}">
+                            <i class="fas fa-box me-1"></i> Produits
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'categorie' %}" class="nav-link {% if request.resolver_match.url_name == 'categorie' %}active{% endif %}">
+                            <i class="fas fa-tags me-1"></i> Catégories
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'page_produits' %}" class="nav-link {% if request.resolver_match.url_name == 'page_produits' %}active{% endif %}">
+                            <i class="fas fa-list me-1"></i> Liste des produits
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'liste_categories' %}" class="nav-link {% if request.resolver_match.url_name == 'liste_categories' %}active{% endif %}">
+                            <i class="fas fa-layer-group me-1"></i> Liste des catégories
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav">
+                    <!-- Lien Favoris -->
+                    <li class="nav-item me-3">
+                        <a href="{% url 'appeler_page_favorie' %}" class="nav-link {% if request.resolver_match.url_name == 'favoris' %}active{% endif %}">
+                            <i class="fas fa-heart me-1"></i> Favoris
+                            {% if user.is_authenticated and request.session.favoris_count %}
+                            <span class="badge bg-danger rounded-pill">{{ request.session.favoris_count }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+{% if request.session.nom %}
+<li class="nav-item dropdown me-3">
+    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fas fa-user-circle me-2"></i>
+        <span>Bonjour, <strong>{{ request.session.nom }}</strong></span>
+    </a>
+    <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="{% url 'call_profil' %}"><i class="fas fa-user me-2"></i> Mon profil</a></li>
+        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Paramètres</a></li>
+        <li><a class="dropdown-item" href="{% url 'appeler_page_favorie' %}"><i class="fas fa-heart me-2"></i> Mes favoris</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item text-danger" href="{% url 'login' %}"><i class="fas fa-sign-out-alt me-2"></i> Déconnexion</a></li>
+    </ul>
+</li>
+{% else %}
+<!-- affichage pour utilisateur non connecté -->
+
+                    <li class="nav-item">
+                        <a href="{% url 'login' %}" class="btn btn-primary px-4">
+                            <i class="fas fa-sign-in-alt me-2"></i> Connexion
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    <div class="container mt-3">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+            {% if message.tags == 'success' %}
+            <i class="fas fa-check-circle me-2"></i>
+            {% elif message.tags == 'error' %}
+            <i class="fas fa-exclamation-circle me-2"></i>
+            {% elif message.tags == 'warning' %}
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            {% elif message.tags == 'info' %}
+            <i class="fas fa-info-circle me-2"></i>
+            {% endif %}
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- CONTENU PRINCIPAL -->
+    <main class="container mt-4 mb-5">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- PIED DE PAGE -->
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5 class="fw-bold">Marché Virtuel</h5>
+                    <p class="mb-0">Votre plateforme d'achat en ligne préférée.</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5 class="fw-bold">Liens rapides</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'produit' %}" class="text-light text-decoration-none">Produits</a></li>
+                        <li><a href="{% url 'categorie' %}" class="text-light text-decoration-none">Catégories</a></li>
+                        <li><a href="{% url 'page_produits' %}" class="text-light text-decoration-none">Liste des produits</a></li>
+                        <li><a href="{% url 'appeler_page_favorie' %}" class="text-light text-decoration-none">Favoris</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5 class="fw-bold">Contact</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-envelope me-2"></i> contact@marche-virtuel.com</li>
+                        <li><i class="fas fa-phone me-2"></i> +33 1 23 45 67 89</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+                <p class="mb-0">&copy; 2023 Marché Virtuel. Tous droits réservés.</p>
+                <div class="mt-2 mt-md-0">
+                    <a href="#" class="text-light me-3"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-light me-3"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-light"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <!-- Scripts personnalisés -->
+    <script>
+        // Gestion des messages avec timeout
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-dismiss alerts after 5 seconds
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                setTimeout(function() {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 5000);
+            });
+            
+            // Active le lien de navigation courant
+            const currentUrl = window.location.pathname;
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('href') === currentUrl) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
